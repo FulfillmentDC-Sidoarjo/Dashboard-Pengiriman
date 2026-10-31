@@ -31,6 +31,7 @@
   .box .nm{font-weight:600;margin:2px 0 10px;line-height:1.3;min-height:36px}
   .box .row{display:flex;justify-content:space-between;align-items:baseline;color:var(--mut);font-size:12px}
   .box .row b{color:var(--tx);font-size:16px;font-weight:600}
+  .box .tg{font-size:11px;color:var(--ac);font-weight:600;margin-top:10px}
   .bar{height:5px;background:#eef0f4;border-radius:3px;margin-top:10px}
   .bar i{display:block;height:5px;background:var(--ac);border-radius:3px}
   .empty{padding:40px;text-align:center;color:var(--mut);background:var(--card);border:1px dashed var(--line);border-radius:12px}
@@ -104,11 +105,17 @@ function render() {
   document.getElementById('sOrd').textContent = fmt(totOrd, 0);
   document.getElementById('sCbm').textContent = fmt(totCbm, 2);
 
+  const now = new Date();
+  const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  const p = tgl.split('-');
+  const label = tgl ? (tgl > today ? 'PLAN PENGIRIMAN TANGGAL : ' : 'PENGIRIMAN TANGGAL : ') + p[2] + '/' + p[1] + '/' + p[0] : '';
+
   document.getElementById('out').innerHTML = list.length ? list.map(x =>
     '<div class="box"><div class="code">' + esc(x.code) + '</div>' +
     '<div class="nm">' + esc(x.name) + '</div>' +
     '<div class="row"><span>' + x.n + ' order</span><b>' + fmt(x.cbm, 2) + ' CBM</b></div>' +
-    '<div class="bar"><i style="width:' + Math.max(3, x.cbm / max * 100) + '%"></i></div></div>'
+    '<div class="bar"><i style="width:' + Math.max(3, x.cbm / max * 100) + '%"></i></div>' +
+    '<div class="tg">' + label + '</div></div>'
   ).join('') : '<div class="empty" style="grid-column:1/-1">Tidak ada pengiriman pada tanggal ini.</div>';
 }
 document.getElementById('tgl').addEventListener('change', render);
