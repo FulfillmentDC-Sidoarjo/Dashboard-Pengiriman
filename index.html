@@ -117,39 +117,55 @@ fetch(API).then(r => r.json()).then(d => {
   document.getElementById('out').innerHTML = '<div class="empty" style="grid-column:1/-1">Data belum bisa dimuat.</div>';
 });
 
+const hariIni = () => {
+  const n = new Date();
+  return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+};
+const labelTgl = t => {
+  const p = t.split('-');
+  return (t > hariIni() ? 'PLAN PENGIRIMAN TANGGAL : ' : 'PENGIRIMAN TANGGAL : ') + p[2] + '/' + p[1] + '/' + p[0];
+};
+const pesan = t => '<div class="empty" style="grid-column:1/-1">' + t + '</div>';
+
 function render() {
   const tgl = document.getElementById('tgl').value;
   const q = document.getElementById('cari').value.trim().toLowerCase();
+  const out = document.getElementById('out');
+  const semua = !tgl; // tanggal kosong = cari di semua tanggal
+
+  if (semua && !q) {
+    document.getElementById('sShip').textContent = '-';
+    document.getElementById('sOrd').textContent = '-';
+    document.getElementById('sCbm').textContent = '-';
+    out.innerHTML = pesan('Pilih tanggal pengiriman, atau ketik ship to / nama toko untuk mencari di semua tanggal.');
+    return;
+  }
+
   const map = {};
   ROWS.forEach(r => {
-    if (r[0] !== tgl) return;
-    const k = r[1];
-    (map[k] = map[k] || {code: r[1], name: r[2], city: r[3], n: 0, cbm: 0});
+    if (!semua && r[0] !== tgl) return;
+    const k = r[0] + '|' + r[1];
+    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], n: 0, cbm: 0});
     map[k].n++; map[k].cbm += r[4];
   });
   let list = Object.values(map).filter(x =>
     !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q));
-  list.sort((a, b) => b.cbm - a.cbm);
+  list.sort((a, b) => semua ? (b.date.localeCompare(a.date) || b.cbm - a.cbm) : b.cbm - a.cbm);
 
   const totOrd = list.reduce((s, x) => s + x.n, 0);
   const totCbm = list.reduce((s, x) => s + x.cbm, 0);
-  const max = list.length ? list[0].cbm : 1;
+  const max = list.reduce((m, x) => Math.max(m, x.cbm), 1);
   document.getElementById('sShip').textContent = fmt(list.length, 0);
   document.getElementById('sOrd').textContent = fmt(totOrd, 0);
   document.getElementById('sCbm').textContent = fmt(totCbm, 2);
 
-  const now = new Date();
-  const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-  const p = tgl.split('-');
-  const label = tgl ? (tgl > today ? 'PLAN PENGIRIMAN TANGGAL : ' : 'PENGIRIMAN TANGGAL : ') + p[2] + '/' + p[1] + '/' + p[0] : '';
-
-  document.getElementById('out').innerHTML = list.length ? list.map(x =>
+  out.innerHTML = list.length ? list.map(x =>
     '<div class="box"><div class="code">' + esc(x.code) + '</div>' +
     '<div class="nm">' + esc(x.name) + '</div>' +
     '<div class="row"><span>' + x.n + ' order</span><b>' + fmt(x.cbm, 2) + ' CBM</b></div>' +
     '<div class="bar"><i style="width:' + Math.max(3, x.cbm / max * 100) + '%"></i></div>' +
-    '<div class="tg">' + label + '</div></div>'
-  ).join('') : '<div class="empty" style="grid-column:1/-1">Tidak ada pengiriman pada tanggal ini.</div>';
+    '<div class="tg">' + labelTgl(x.date) + '</div></div>'
+  ).join('') : pesan(semua ? 'Ship to tidak ditemukan.' : 'Tidak ada pengiriman pada tanggal ini.');
 }
 document.getElementById('tgl').addEventListener('change', render);
 document.getElementById('cari').addEventListener('input', render);
