@@ -131,7 +131,8 @@ function render() {
   const tgl = document.getElementById('tgl').value;
   const q = document.getElementById('cari').value.trim().toLowerCase();
   const out = document.getElementById('out');
-  const semua = !tgl; // tanggal kosong = cari di semua tanggal
+  const semua = !!q || !tgl; // ada pencarian atau tanggal kosong = cari di semua tanggal
+  document.getElementById('judul').textContent = q ? 'Ship to · semua tanggal' : 'Ship to';
 
   if (semua && !q) {
     document.getElementById('sShip').textContent = '-';
