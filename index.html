@@ -112,6 +112,7 @@
   .k2 .a{font-size:11px;color:var(--ink2)}
   .k2 .nm{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3}
   .k2 .dt{font-size:11px;font-weight:700;color:var(--ink2);margin-top:3px}
+  .k2 .ord{font-size:11px;font-weight:700;color:#8A5A00;margin-top:3px;word-break:break-all}
   .k2 .v{text-align:right;flex:none}
   .k2 .v b{display:block;font-size:16px;font-weight:700;color:var(--ink)}
   .k2 .v span{font-size:11px;color:var(--ink2)}
@@ -132,6 +133,7 @@
   .tw th{position:sticky;top:0;background:var(--ink);color:#fff;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap}
   .tw td{padding:7px 10px;border-top:1px solid #E3E8F0;white-space:nowrap;color:var(--ink)}
   .tw tr:nth-child(even) td{background:#F7F9FC}
+  .tw tr.hl td{background:#FFF1BF}
   .pill{display:inline-block;padding:2px 8px;border-radius:10px;background:#FBE9B7;color:var(--ink);font-weight:600;font-size:11px}
   .pill.ok{background:#CFE5DE}
   .empty{padding:40px;text-align:center;color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:14px}
@@ -149,7 +151,7 @@
     <label for="tgl">Tanggal pengiriman</label>
     <input type="date" id="tgl">
     <label for="cari">Cari</label>
-    <input type="search" id="cari" placeholder="Ship to atau nama toko">
+    <input type="search" id="cari" placeholder="Ship to, nama toko, atau order key">
     <label class="ck"><input type="checkbox" id="semua" checked> Cari di semua tanggal</label>
     <nav><div class="on">Ship to</div></nav>
   </aside>
@@ -224,7 +226,8 @@ const isWH = x => /^H/i.test(x.code) || /^WH\b/i.test(x.name);
 const kartu = (x, semua) =>
   '<div class="k2" tabindex="0" role="button" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '">' +
   '<div class="l"><div class="a">' + esc(x.code) + '</div><div class="nm">' + esc(x.name) + '</div>' +
-  (semua ? '<div class="dt">' + labelTgl(x.date) + '</div>' : '') + '</div>' +
+  (semua ? '<div class="dt">' + labelTgl(x.date) + '</div>' : '') +
+  (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') + '</div>' +
   '<div class="v"><b>' + fmt(x.cbm, 2) + '</b><span>' + x.n + ' order</span></div></div>';
 
 const grup = (judul, arr, semua) => arr.length
@@ -254,12 +257,16 @@ function render() {
   ROWS.forEach(r => {
     if (!semua && r[0] !== tgl) return;
     const k = r[0] + '|' + r[1];
-    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], wil: wilDari(r), n: 0, cbm: 0});
-    map[k].n++; map[k].cbm += r[4];
+    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], wil: wilDari(r), exts: [], n: 0, cbm: 0});
+    map[k].n++; map[k].cbm += r[4]; if (r[5]) map[k].exts.push(String(r[5]));
   });
   let list = Object.values(map).filter(x =>
-    !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q));
+    !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q) ||
+    x.exts.some(s => s.toLowerCase().includes(q)));
   list.sort((a, b) => semua ? (b.date.localeCompare(a.date) || b.cbm - a.cbm) : b.cbm - a.cbm);
+
+  // order key yang cocok dengan pencarian, ditampilkan di kartu
+  list.forEach(x => { x.hit = q ? x.exts.filter(s => s.toLowerCase().includes(q)) : []; });
 
   // ringkasan per wilayah: dihitung dari hasil tanggal/pencarian saat ini, sebelum disaring wilayah
   const wEl = document.getElementById('wil');
@@ -300,8 +307,8 @@ function render() {
   document.getElementById('sCbm').textContent = fmt(totCbm, 2);
 
   if (!list.length) {
-    out.innerHTML = pesan(semua ? 'Ship to tidak ditemukan.' :
-      (q ? 'Ship to tidak ditemukan pada tanggal ini. Centang "Cari di semua tanggal" untuk mencari di tanggal lain.'
+    out.innerHTML = pesan(semua ? 'Ship to atau order key tidak ditemukan.' :
+      (q ? 'Ship to atau order key tidak ditemukan pada tanggal ini. Centang "Cari di semua tanggal" untuk mencari di tanggal lain.'
          : 'Tidak ada pengiriman pada tanggal ini.'));
     return;
   }
@@ -359,14 +366,17 @@ function bukaDetail(date, code) {
         return;
       }
       const tot = L.reduce((s, o) => s + num(o.cbm), 0);
+      const qq = document.getElementById('cari').value.trim().toLowerCase();
       const alamat = L[0].address ? '<div class="adr">' + esc(String(L[0].address)) + '</div>' : '';
       mBody.innerHTML = head + alamat +
         '<div class="chips"><span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span></div>' +
         '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
         '<th style="text-align:right">CBM</th></tr></thead><tbody>' +
-        L.map((o, i) => '<tr><td>' + (i + 1) + '</td><td>' + txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
+        L.map((o, i) => '<tr' + (qq && String(o.ext).toLowerCase().includes(qq) ? ' class="hl"' : '') + '><td>' + (i + 1) + '</td><td>' + txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
           '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>').join('') +
         '</tbody></table></div>';
+      const hl1 = mBody.querySelector('tr.hl');
+      if (hl1) hl1.scrollIntoView({block: 'center'});
     })
     .catch(() => {
       if (my === reqId) mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Detail order belum bisa dimuat.</div>';
