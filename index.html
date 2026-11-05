@@ -123,8 +123,14 @@
   .panel{position:relative;max-width:1100px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:14px;border-top:5px solid var(--ink);padding:20px}
   .x{position:absolute;top:10px;right:14px;border:0;background:none;font:inherit;font-size:28px;line-height:1;color:var(--ink);cursor:pointer}
   .mh .code{font-size:12px;color:var(--ink2);letter-spacing:.3px}
-  .mh h3{margin:2px 40px 6px 0;font-size:20px;font-weight:800;color:var(--ink)}
+  .mh h3{margin:2px 0 6px 0;font-size:20px;font-weight:800;color:var(--ink)}
   .mh .tg{font-size:11px;font-weight:700;color:var(--ink)}
+  .mh{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-right:34px}
+  .mhl{min-width:0;flex:1}
+  .ship{margin:0;flex:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 14px;width:min(340px,45%);font-size:12px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 14px}
+  .ship dt{color:var(--ink2);font-weight:600;white-space:nowrap}
+  .ship dd{margin:0;color:var(--ink);font-weight:700;word-break:break-word}
+  @media(max-width:720px){.mh{flex-direction:column;padding-right:0}.mh h3{margin-right:36px}.ship{width:100%}}
   .adr{margin-top:8px;font-size:12px;color:var(--ink2)}
   .chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .chips span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:12px;color:var(--ink)}
@@ -341,13 +347,22 @@ function detailDari(date, code) {
   return {details: L.map(r => ({ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code]}))};
 }
 
+// info pengiriman (shipping detail, transport, driver, assistant driver) dari baris ship to ini
+function shipBox(date, code) {
+  const L = ROWS.filter(r => r[0] === date && r[1] === code);
+  if (!L.length || L[0].length < 13) return ''; // Code.gs lama belum mengirim kolom ini
+  const vals = i => [...new Set(L.map(r => String(r[i] == null ? '' : r[i]).trim()).filter(Boolean))].join(' / ');
+  const f = [['Shipping detail', 9], ['Transport', 10], ['Driver', 11], ['Assistant driver', 12]];
+  return '<dl class="ship">' + f.map(a => '<dt>' + a[0] + '</dt><dd>' + txt(vals(a[1])) + '</dd>').join('') + '</dl>';
+}
+
 function bukaDetail(date, code) {
   const x = CUR[date + '|' + code];
   if (!x) return;
   const my = ++reqId;
-  const head = '<div class="mh"><div class="code">' + esc(x.code) + '</div>' +
+  const head = '<div class="mh"><div class="mhl"><div class="code">' + esc(x.code) + '</div>' +
     '<h3 id="mTitle">' + esc(x.name) + '</h3>' +
-    '<div class="tg">' + labelTgl(x.date) + '</div></div>';
+    '<div class="tg">' + labelTgl(x.date) + '</div></div>' + shipBox(date, code) + '</div>';
   mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Memuat detail order...</div>';
   modal.classList.add('on');
   document.body.style.overflow = 'hidden';
