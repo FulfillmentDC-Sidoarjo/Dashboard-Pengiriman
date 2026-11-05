@@ -40,6 +40,8 @@
   input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--bg);color:var(--tx);color-scheme:dark}
   input::placeholder{color:var(--mut)}
   input:focus{outline:2px solid var(--yel);outline-offset:1px;border-color:var(--yel)}
+  label.ck{display:flex;align-items:center;gap:8px;margin:10px 0 0;cursor:pointer}
+  .ck input{width:16px;height:16px;padding:0;margin:0;accent-color:#F2B72E}
   nav{margin-top:22px}
   nav div{padding:9px 12px;border-radius:10px;color:var(--mut)}
   nav div.on{background:var(--acbg);color:var(--yel);font-weight:700}
@@ -106,6 +108,7 @@
     <input type="date" id="tgl">
     <label for="cari">Cari</label>
     <input type="search" id="cari" placeholder="Ship to atau nama toko">
+    <label class="ck"><input type="checkbox" id="semua" checked> Cari di semua tanggal</label>
     <nav><div class="on">Ship to</div></nav>
   </aside>
   <main>
@@ -182,8 +185,9 @@ function render() {
   const tgl = document.getElementById('tgl').value;
   const q = document.getElementById('cari').value.trim().toLowerCase();
   const out = document.getElementById('out');
-  const semua = !!q || !tgl; // ada pencarian atau tanggal kosong = cari di semua tanggal
-  document.getElementById('judul').textContent = q ? 'Ship to · semua tanggal' : 'Ship to';
+  // semua tanggal: tanggal kosong, atau ada pencarian dan kotak "Cari di semua tanggal" dicentang
+  const semua = !tgl || (!!q && document.getElementById('semua').checked);
+  document.getElementById('judul').textContent = (q && semua) ? 'Ship to · semua tanggal' : 'Ship to';
 
   if (semua && !q) {
     document.getElementById('sShip').textContent = '-';
@@ -214,7 +218,9 @@ function render() {
   document.getElementById('sCbm').textContent = fmt(totCbm, 2);
 
   if (!list.length) {
-    out.innerHTML = pesan(semua ? 'Ship to tidak ditemukan.' : 'Tidak ada pengiriman pada tanggal ini.');
+    out.innerHTML = pesan(semua ? 'Ship to tidak ditemukan.' :
+      (q ? 'Ship to tidak ditemukan pada tanggal ini. Centang "Cari di semua tanggal" untuk mencari di tanggal lain.'
+         : 'Tidak ada pengiriman pada tanggal ini.'));
     return;
   }
   out.innerHTML = (semua ? '' : '<div class="hdt">' + labelTgl(tgl) + '</div>') +
@@ -299,7 +305,12 @@ document.getElementById('mClose').addEventListener('click', tutup);
 modal.addEventListener('click', e => { if (e.target === modal) tutup(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') tutup(); });
 
-document.getElementById('tgl').addEventListener('change', render);
+document.getElementById('tgl').addEventListener('change', () => {
+  // memilih tanggal = filter tanggal berlaku, jadi centang "semua tanggal" dilepas
+  if (document.getElementById('tgl').value) document.getElementById('semua').checked = false;
+  render();
+});
+document.getElementById('semua').addEventListener('change', render);
 document.getElementById('cari').addEventListener('input', render);
 </script>
 </body>
