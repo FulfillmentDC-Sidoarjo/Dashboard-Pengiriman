@@ -80,6 +80,24 @@
   .sum small{display:block;color:var(--ink2);font-size:12px}
   .sum b{font-size:22px;font-weight:700}
 
+  /* ringkasan per wilayah, tampil sebelum kartu ship to */
+  .wil{margin:0 0 24px}
+  .wil:empty{display:none}
+  .wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+  .wh b{font-size:14px;font-weight:700}
+  .wh span{font-size:12px;color:var(--mut)}
+  .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .wk{font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:14px;padding:11px 14px 12px;box-shadow:0 4px 14px rgba(0,0,0,.3);transition:transform .12s,box-shadow .12s}
+  .wk:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.34)}
+  .wk:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+  .wk.on{outline:3px solid var(--yel);outline-offset:1px}
+  .wk .wn{font-size:12px;font-weight:700;line-height:1.3}
+  .wk .wv{font-size:22px;font-weight:700;line-height:1.2}
+  .wk .wv small{font-size:11px;font-weight:600;color:var(--ink2)}
+  .wk .wm,.wk .wp{font-size:11px;color:var(--ink2)}
+  .wk .wb{display:block;height:5px;border-radius:3px;background:#DDE3EC;margin-top:8px;overflow:hidden}
+  .wk .wb i{display:block;height:100%;background:var(--c);border-radius:3px}
+
   /* tampilan dikelompokkan: warehouse dan store */
   .hdt{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.4px;margin:0 0 16px}
   .grp{margin-bottom:24px}
@@ -145,6 +163,7 @@
       <div><small>Jumlah order</small><b id="sOrd">-</b></div>
       <div><small>Total CBM</small><b id="sCbm">-</b></div>
     </div>
+    <div class="wil" id="wil" role="group" aria-label="Ringkasan per wilayah"></div>
     <div id="out"><div class="empty">Memuat data...</div></div>
   </main>
 </div>
@@ -160,12 +179,17 @@ const fmt = (n, d) => n.toLocaleString('id-ID', {minimumFractionDigits: d, maxim
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let ROWS = [];
 let ADDR = {}; // alamat per ship to
+let WIL = {}; // wilayah per ship to (opsional; bisa juga kolom ke-9 di tiap baris)
+let HAS_WIL = false;
+let selWil = ''; // wilayah yang sedang dipilih, kosong = semua
 const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
 fetch(API).then(r => r.json()).then(d => {
   if (d.error) throw new Error(d.error);
   ROWS = d.rows || [];
   ADDR = d.addr || {};
+  WIL = d.wil || {};
+  HAS_WIL = ROWS.some(r => wilDari(r));
   const dates = ROWS.map(r => r[0]).sort();
   const tgl = document.getElementById('tgl');
   if (dates.length) {
@@ -189,6 +213,10 @@ const labelTgl = t => {
   return (t > hariIni() ? 'PLAN PENGIRIMAN TANGGAL : ' : 'PENGIRIMAN TANGGAL : ') + p[2] + '/' + p[1] + '/' + p[0];
 };
 const pesan = t => '<div class="empty">' + t + '</div>';
+
+// wilayah: dari d.wil[kode ship to], atau kolom ke-9 (indeks 8) pada baris
+const NO_WIL = 'Tanpa wilayah';
+const wilDari = r => String((WIL[r[1]] != null ? WIL[r[1]] : r[8]) || '').trim();
 
 // warehouse = kode berawalan H atau nama berawalan WH, selebihnya store
 const isWH = x => /^H/i.test(x.code) || /^WH\b/i.test(x.name);
@@ -217,6 +245,7 @@ function render() {
     document.getElementById('sShip').textContent = '-';
     document.getElementById('sOrd').textContent = '-';
     document.getElementById('sCbm').textContent = '-';
+    document.getElementById('wil').innerHTML = '';
     out.innerHTML = pesan('Pilih tanggal pengiriman, atau ketik ship to / nama toko untuk mencari di semua tanggal.');
     return;
   }
@@ -225,12 +254,41 @@ function render() {
   ROWS.forEach(r => {
     if (!semua && r[0] !== tgl) return;
     const k = r[0] + '|' + r[1];
-    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], n: 0, cbm: 0});
+    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], wil: wilDari(r), n: 0, cbm: 0});
     map[k].n++; map[k].cbm += r[4];
   });
   let list = Object.values(map).filter(x =>
     !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q));
   list.sort((a, b) => semua ? (b.date.localeCompare(a.date) || b.cbm - a.cbm) : b.cbm - a.cbm);
+
+  // ringkasan per wilayah: dihitung dari hasil tanggal/pencarian saat ini, sebelum disaring wilayah
+  const wEl = document.getElementById('wil');
+  if (!HAS_WIL) {
+    wEl.innerHTML = '';
+  } else {
+    const wc = {};
+    list.forEach(x => {
+      const w = x.wil || NO_WIL;
+      const a = (wc[w] = wc[w] || {ship: 0, n: 0, cbm: 0});
+      a.ship++; a.n += x.n; a.cbm += x.cbm;
+    });
+    if (selWil && !(selWil in wc)) selWil = '';
+    const wk = Object.keys(wc).sort((a, b) => ((a === NO_WIL) - (b === NO_WIL)) || wc[b].cbm - wc[a].cbm);
+    const tot = list.reduce((s, x) => s + x.cbm, 0) || 1;
+    const warna = ['--teal', '--red', '--yel', '--steel'];
+    wEl.innerHTML = '<div class="wh"><b>Ringkasan per wilayah</b><span>' +
+      (selWil ? 'Menampilkan ' + esc(selWil) + ' · klik lagi untuk semua' : 'Klik wilayah untuk menyaring ship to') + '</span></div>' +
+      '<div class="wgrid">' + wk.map((w, i) => {
+        const a = wc[w], pc = Math.round(a.cbm / tot * 100);
+        return '<button type="button" class="wk' + (w === selWil ? ' on' : '') + '" style="--c:var(' + warna[i % 4] + ')" data-w="' + esc(w) +
+          '" aria-pressed="' + (w === selWil) + '"><span class="wn">' + esc(w) + '</span>' +
+          '<span class="wv">' + fmt(a.cbm, 2) + '<small> CBM</small></span>' +
+          '<span class="wm">' + fmt(a.ship, 0) + ' ship to · ' + fmt(a.n, 0) + ' order</span>' +
+          '<span class="wb"><i style="width:' + Math.max(pc, 2) + '%"></i></span>' +
+          '<span class="wp">' + pc + '% dari total CBM</span></button>';
+      }).join('') + '</div>';
+    if (selWil) list = list.filter(x => (x.wil || NO_WIL) === selWil);
+  }
 
   Object.keys(CUR).forEach(k => delete CUR[k]);
   list.forEach(x => { CUR[x.date + '|' + x.code] = x; });
@@ -333,6 +391,15 @@ document.getElementById('tgl').addEventListener('change', () => {
   // memilih tanggal = filter tanggal berlaku, jadi centang "semua tanggal" dilepas
   if (document.getElementById('tgl').value) document.getElementById('semua').checked = false;
   render();
+});
+document.getElementById('wil').addEventListener('click', e => {
+  const b = e.target.closest('.wk');
+  if (!b) return;
+  const w = b.dataset.w;
+  selWil = (w === selWil) ? '' : w;
+  render();
+  const nb = [...document.querySelectorAll('#wil .wk')].find(x => x.dataset.w === w);
+  if (nb) nb.focus();
 });
 document.getElementById('semua').addEventListener('change', render);
 document.getElementById('cari').addEventListener('input', render);
