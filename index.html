@@ -245,10 +245,9 @@ function bukaDetail(date, code) {
       mBody.innerHTML = head + alamat +
         '<div class="chips"><span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span></div>' +
         '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
-        '<th>CBM</th><th>No LC</th><th>Shipping detail</th><th>Driver</th><th>Asisten driver</th></tr></thead><tbody>' +
+        '<th style="text-align:right">CBM</th></tr></thead><tbody>' +
         L.map((o, i) => '<tr><td>' + (i + 1) + '</td><td>' + txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
-          '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td><td>' + txt(o.lc) + '</td><td>' + txt(o.ship) +
-          '</td><td>' + txt(o.driver) + '</td><td>' + txt(o.asst) + '</td></tr>').join('') +
+          '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>').join('') +
         '</tbody></table></div>';
     })
     .catch(() => {
