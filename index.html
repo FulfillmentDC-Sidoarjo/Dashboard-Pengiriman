@@ -64,6 +64,26 @@
   .box .tg{font-size:11px;color:var(--ink);font-weight:700;margin-top:10px}
   .bar{height:6px;background:rgba(27,64,121,.12);border-radius:3px;margin-top:10px}
   .bar i{display:block;height:6px;background:var(--c);border-radius:3px}
+  .box{cursor:pointer;transition:transform .12s,box-shadow .12s}
+  .box:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.22)}
+  .box:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+  .modal{display:none;position:fixed;inset:0;background:rgba(10,25,55,.68);z-index:10;padding:24px;overflow:auto}
+  .modal.on{display:block}
+  .panel{position:relative;max-width:1100px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:14px;border-top:5px solid var(--ink);padding:20px}
+  .x{position:absolute;top:10px;right:14px;border:0;background:none;font:inherit;font-size:28px;line-height:1;color:var(--ink);cursor:pointer}
+  .mh .code{font-size:12px;color:var(--ink2);letter-spacing:.3px}
+  .mh h3{margin:2px 40px 6px 0;font-size:20px;font-weight:800;color:var(--ink)}
+  .mh .tg{font-size:11px;font-weight:700;color:var(--ink)}
+  .adr{margin-top:8px;font-size:12px;color:var(--ink2)}
+  .chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .chips span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:12px;color:var(--ink)}
+  .tw{margin-top:14px;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .tw table{border-collapse:collapse;width:100%;font-size:12px}
+  .tw th{position:sticky;top:0;background:var(--ink);color:#fff;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap}
+  .tw td{padding:7px 10px;border-top:1px solid #E3E8F0;white-space:nowrap;color:var(--ink)}
+  .tw tr:nth-child(even) td{background:#F7F9FC}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;background:#FBE9B7;color:var(--ink);font-weight:600;font-size:11px}
+  .pill.ok{background:#CFE5DE}
   .empty{padding:40px;text-align:center;color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:14px}
   @media(max-width:720px){.wrap{grid-template-columns:1fr}}
 </style>
@@ -94,11 +114,18 @@
     <div id="out" class="grid"><div class="empty" style="grid-column:1/-1">Memuat data...</div></div>
   </main>
 </div>
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="x" id="mClose" aria-label="Tutup">&times;</button>
+    <div id="mBody"></div>
+  </div>
+</div>
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbwrAckizj_u62pHaYZJ1fvDNjpee-6qkGFSTvTRwEwMXRmOgJzyNGshP9Oi4zcYn6Ba/exec?token=dashboard-pengiriman-250403109876dd';
 const fmt = (n, d) => n.toLocaleString('id-ID', {minimumFractionDigits: d, maximumFractionDigits: d});
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let ROWS = [];
+const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
 fetch(API).then(r => r.json()).then(d => {
   if (d.error) throw new Error(d.error);
@@ -153,6 +180,9 @@ function render() {
     !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q));
   list.sort((a, b) => semua ? (b.date.localeCompare(a.date) || b.cbm - a.cbm) : b.cbm - a.cbm);
 
+  Object.keys(CUR).forEach(k => delete CUR[k]);
+  list.forEach(x => { CUR[x.date + '|' + x.code] = x; });
+
   const totOrd = list.reduce((s, x) => s + x.n, 0);
   const totCbm = list.reduce((s, x) => s + x.cbm, 0);
   const max = list.reduce((m, x) => Math.max(m, x.cbm), 1);
@@ -161,13 +191,85 @@ function render() {
   document.getElementById('sCbm').textContent = fmt(totCbm, 2);
 
   out.innerHTML = list.length ? list.map(x =>
-    '<div class="box"><div class="code">' + esc(x.code) + '</div>' +
+    '<div class="box" tabindex="0" role="button" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '"><div class="code">' + esc(x.code) + '</div>' +
     '<div class="nm">' + esc(x.name) + '</div>' +
     '<div class="row"><span>' + x.n + ' order</span><b>' + fmt(x.cbm, 2) + ' CBM</b></div>' +
     '<div class="bar"><i style="width:' + Math.max(3, x.cbm / max * 100) + '%"></i></div>' +
     '<div class="tg">' + labelTgl(x.date) + '</div></div>'
   ).join('') : pesan(semua ? 'Ship to tidak ditemukan.' : 'Tidak ada pengiriman pada tanggal ini.');
 }
+const num = v => typeof v === 'number' ? v : (parseFloat(String(v == null ? '' : v).replace(',', '.')) || 0);
+const txt = v => esc(String(v == null || v === '' ? '-' : v));
+const pill = v => {
+  const t = String(v == null ? '' : v).trim();
+  if (!t) return '-';
+  return '<span class="pill' + (t.toUpperCase() === 'TERKIRIM' ? ' ok' : '') + '">' + esc(t) + '</span>';
+};
+const modal = document.getElementById('modal');
+const mBody = document.getElementById('mBody');
+let reqId = 0;
+
+function tutup() {
+  modal.classList.remove('on');
+  document.body.style.overflow = '';
+  reqId++;
+}
+
+function bukaDetail(date, code) {
+  const x = CUR[date + '|' + code];
+  if (!x) return;
+  const my = ++reqId;
+  const head = '<div class="mh"><div class="code">' + esc(x.code) + '</div>' +
+    '<h3 id="mTitle">' + esc(x.name) + '</h3>' +
+    '<div class="tg">' + labelTgl(x.date) + '</div></div>';
+  mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Memuat detail order...</div>';
+  modal.classList.add('on');
+  document.body.style.overflow = 'hidden';
+
+  fetch(API + '&code=' + encodeURIComponent(code) + '&date=' + encodeURIComponent(date))
+    .then(r => r.json())
+    .then(d => {
+      if (my !== reqId) return;
+      if (d.error) throw new Error(d.error);
+      if (!Array.isArray(d.details)) {
+        mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Detail order belum tersedia. Code.gs perlu diperbarui dulu.</div>';
+        return;
+      }
+      const L = d.details;
+      if (!L.length) {
+        mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Tidak ada detail order.</div>';
+        return;
+      }
+      const tot = L.reduce((s, o) => s + num(o.cbm), 0);
+      const alamat = L[0].address ? '<div class="adr">' + esc(String(L[0].address)) + '</div>' : '';
+      mBody.innerHTML = head + alamat +
+        '<div class="chips"><span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span></div>' +
+        '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
+        '<th>CBM</th><th>No LC</th><th>Shipping detail</th><th>Driver</th><th>Asisten driver</th></tr></thead><tbody>' +
+        L.map((o, i) => '<tr><td>' + (i + 1) + '</td><td>' + txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
+          '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td><td>' + txt(o.lc) + '</td><td>' + txt(o.ship) +
+          '</td><td>' + txt(o.driver) + '</td><td>' + txt(o.asst) + '</td></tr>').join('') +
+        '</tbody></table></div>';
+    })
+    .catch(() => {
+      if (my === reqId) mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Detail order belum bisa dimuat.</div>';
+    });
+}
+
+const out = document.getElementById('out');
+out.addEventListener('click', e => {
+  const b = e.target.closest('.box');
+  if (b) bukaDetail(b.dataset.d, b.dataset.c);
+});
+out.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const b = e.target.closest('.box');
+  if (b) { e.preventDefault(); bukaDetail(b.dataset.d, b.dataset.c); }
+});
+document.getElementById('mClose').addEventListener('click', tutup);
+modal.addEventListener('click', e => { if (e.target === modal) tutup(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') tutup(); });
+
 document.getElementById('tgl').addEventListener('change', render);
 document.getElementById('cari').addEventListener('input', render);
 </script>
