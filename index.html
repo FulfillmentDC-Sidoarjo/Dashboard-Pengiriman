@@ -347,12 +347,12 @@ function detailDari(date, code) {
   return {details: L.map(r => ({ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code]}))};
 }
 
-// info pengiriman (shipping detail, transport, driver, assistant driver) dari baris ship to ini
+// info pengiriman (shipping detail, transport driver, assistant driver) dari baris ship to ini
 function shipBox(date, code) {
   const L = ROWS.filter(r => r[0] === date && r[1] === code);
-  if (!L.length || L[0].length < 13) return ''; // Code.gs lama belum mengirim kolom ini
+  if (!L.length || L[0].length < 12) return ''; // Code.gs lama belum mengirim kolom ini
   const vals = i => [...new Set(L.map(r => String(r[i] == null ? '' : r[i]).trim()).filter(Boolean))].join(' / ');
-  const f = [['Shipping detail', 9], ['Transport', 10], ['Driver', 11], ['Assistant driver', 12]];
+  const f = [['Shipping detail', 9], ['Transport driver', 10], ['Assistant driver', 11]];
   return '<dl class="ship">' + f.map(a => '<dt>' + a[0] + '</dt><dd>' + txt(vals(a[1])) + '</dd>').join('') + '</dl>';
 }
 
