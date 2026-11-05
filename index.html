@@ -127,10 +127,6 @@
   .mh .tg{font-size:11px;font-weight:700;color:var(--ink)}
   .mh{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-right:34px}
   .mhl{min-width:0;flex:1}
-  .ship{margin:0;flex:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 14px;width:min(340px,45%);font-size:12px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 14px}
-  .ship dt{color:var(--ink2);font-weight:600;white-space:nowrap}
-  .ship dd{margin:0;color:var(--ink);font-weight:700;word-break:break-word}
-  @media(max-width:720px){.mh{flex-direction:column;padding-right:0}.mh h3{margin-right:36px}.ship{width:100%}}
   .adr{margin-top:8px;font-size:12px;color:var(--ink2)}
   .chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .chips span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:12px;color:var(--ink)}
@@ -140,6 +136,12 @@
   .tw td{padding:7px 10px;border-top:1px solid #E3E8F0;white-space:nowrap;color:var(--ink)}
   .tw tr:nth-child(even) td{background:#F7F9FC}
   .tw tr.hl td{background:#FFF1BF}
+  .tw tr.gr td{background:#E6EDF8;border-top:2px solid var(--ink);padding:9px 10px;white-space:normal}
+  .gi{display:flex;flex-wrap:wrap;gap:6px 28px;align-items:flex-start}
+  .gi span{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .gi small{font-size:10px;font-weight:600;color:var(--ink2)}
+  .gi b{font-size:12px;font-weight:700;color:var(--ink);word-break:break-word}
+  .gi .gc{margin-left:auto;align-self:center;font-size:12px;font-weight:700;white-space:nowrap}
   .pill{display:inline-block;padding:2px 8px;border-radius:10px;background:#FBE9B7;color:var(--ink);font-weight:600;font-size:11px}
   .pill.ok{background:#CFE5DE}
   .empty{padding:40px;text-align:center;color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:14px}
@@ -344,16 +346,10 @@ function tutup() {
 function detailDari(date, code) {
   const L = ROWS.filter(r => r[0] === date && r[1] === code);
   if (L.length && L[0].length < 8) return {}; // Code.gs lama belum mengirim detail
-  return {details: L.map(r => ({ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code]}))};
-}
-
-// info pengiriman (shipping detail, transport driver, assistant driver) dari baris ship to ini
-function shipBox(date, code) {
-  const L = ROWS.filter(r => r[0] === date && r[1] === code);
-  if (!L.length || L[0].length < 12) return ''; // Code.gs lama belum mengirim kolom ini
-  const vals = i => [...new Set(L.map(r => String(r[i] == null ? '' : r[i]).trim()).filter(Boolean))].join(' / ');
-  const f = [['Shipping detail', 9], ['Transport driver', 10], ['Assistant driver', 11]];
-  return '<dl class="ship">' + f.map(a => '<dt>' + a[0] + '</dt><dd>' + txt(vals(a[1])) + '</dd>').join('') + '</dl>';
+  const s = v => String(v == null ? '' : v).trim();
+  return {hasShip: L.length > 0 && L[0].length >= 12,
+    details: L.map(r => ({ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code],
+      sd: s(r[9]), td: s(r[10]), ad: s(r[11])}))};
 }
 
 function bukaDetail(date, code) {
@@ -362,7 +358,7 @@ function bukaDetail(date, code) {
   const my = ++reqId;
   const head = '<div class="mh"><div class="mhl"><div class="code">' + esc(x.code) + '</div>' +
     '<h3 id="mTitle">' + esc(x.name) + '</h3>' +
-    '<div class="tg">' + labelTgl(x.date) + '</div></div>' + shipBox(date, code) + '</div>';
+    '<div class="tg">' + labelTgl(x.date) + '</div></div>' + '</div>';
   mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Memuat detail order...</div>';
   modal.classList.add('on');
   document.body.style.overflow = 'hidden';
@@ -383,13 +379,34 @@ function bukaDetail(date, code) {
       const tot = L.reduce((s, o) => s + num(o.cbm), 0);
       const qq = document.getElementById('cari').value.trim().toLowerCase();
       const alamat = L[0].address ? '<div class="adr">' + esc(String(L[0].address)) + '</div>' : '';
+      const baris = (o, i) => '<tr' + (qq && String(o.ext).toLowerCase().includes(qq) ? ' class="hl"' : '') + '><td>' + (i + 1) + '</td><td>' +
+        txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
+        '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>';
+      // kelompokkan per shipping detail + transport driver + assistant driver
+      let isi, nGrp = 0;
+      if (d.hasShip) {
+        const G = {};
+        L.forEach(o => {
+          const k = [o.sd, o.td, o.ad].join('||');
+          (G[k] = G[k] || {sd: o.sd, td: o.td, ad: o.ad, o: [], cbm: 0});
+          G[k].o.push(o); G[k].cbm += num(o.cbm);
+        });
+        const gl = Object.values(G).sort((a, b) => (!a.sd - !b.sd) || a.sd.localeCompare(b.sd, 'id', {numeric: true}));
+        nGrp = gl.length;
+        isi = gl.map(g => '<tbody><tr class="gr"><td colspan="5"><div class="gi">' +
+          '<span><small>Shipping detail</small><b>' + txt(g.sd) + '</b></span>' +
+          '<span><small>Transport driver</small><b>' + txt(g.td) + '</b></span>' +
+          '<span><small>Assistant driver</small><b>' + txt(g.ad) + '</b></span>' +
+          '<span class="gc">' + fmt(g.o.length, 0) + ' order · ' + fmt(g.cbm, 2) + ' CBM</span></div></td></tr>' +
+          g.o.map((o, i) => baris(o, i)).join('') + '</tbody>').join('');
+      } else {
+        isi = '<tbody>' + L.map((o, i) => baris(o, i)).join('') + '</tbody>';
+      }
       mBody.innerHTML = head + alamat +
-        '<div class="chips"><span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span></div>' +
+        '<div class="chips"><span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span>' +
+        (nGrp > 1 ? '<span>' + fmt(nGrp, 0) + ' kelompok</span>' : '') + '</div>' +
         '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
-        '<th style="text-align:right">CBM</th></tr></thead><tbody>' +
-        L.map((o, i) => '<tr' + (qq && String(o.ext).toLowerCase().includes(qq) ? ' class="hl"' : '') + '><td>' + (i + 1) + '</td><td>' + txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
-          '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>').join('') +
-        '</tbody></table></div>';
+        '<th style="text-align:right">CBM</th></tr></thead>' + isi + '</table></div>';
       const hl1 = mBody.querySelector('tr.hl');
       if (hl1) hl1.scrollIntoView({block: 'center'});
     })
