@@ -125,11 +125,13 @@ const API = 'https://script.google.com/macros/s/AKfycbwrAckizj_u62pHaYZJ1fvDNjpe
 const fmt = (n, d) => n.toLocaleString('id-ID', {minimumFractionDigits: d, maximumFractionDigits: d});
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let ROWS = [];
+let ADDR = {}; // alamat per ship to
 const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
 fetch(API).then(r => r.json()).then(d => {
   if (d.error) throw new Error(d.error);
   ROWS = d.rows || [];
+  ADDR = d.addr || {};
   const dates = ROWS.map(r => r[0]).sort();
   const tgl = document.getElementById('tgl');
   if (dates.length) {
@@ -215,6 +217,13 @@ function tutup() {
   reqId++;
 }
 
+// detail diambil dari data yang sudah dimuat, jadi tanpa menunggu server
+function detailDari(date, code) {
+  const L = ROWS.filter(r => r[0] === date && r[1] === code);
+  if (L.length && L[0].length < 8) return {}; // Code.gs lama belum mengirim detail
+  return {details: L.map(r => ({ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code]}))};
+}
+
 function bukaDetail(date, code) {
   const x = CUR[date + '|' + code];
   if (!x) return;
@@ -226,8 +235,8 @@ function bukaDetail(date, code) {
   modal.classList.add('on');
   document.body.style.overflow = 'hidden';
 
-  fetch(API + '&code=' + encodeURIComponent(code) + '&date=' + encodeURIComponent(date))
-    .then(r => r.json())
+  Promise.resolve()
+    .then(() => detailDari(date, code))
     .then(d => {
       if (my !== reqId) return;
       if (d.error) throw new Error(d.error);
