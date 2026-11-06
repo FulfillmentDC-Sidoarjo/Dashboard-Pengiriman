@@ -49,73 +49,74 @@
   @keyframes drift{to{transform:translate3d(75vw,45vh,0)}}
   @media (prefers-reduced-motion:reduce){.bgfx i,.bgfx b,.bgfx::after{animation:none}.bgfx i:nth-child(1){opacity:1;transform:none}}
 
-  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
-  aside{background:linear-gradient(180deg,rgba(24,60,115,.94),rgba(10,30,68,.96));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:22px 16px;border-right:1px solid rgba(255,255,255,.08)}
-  .brand{display:flex;align-items:center;gap:10px;margin:0 0 22px}
+  .app{max-width:1500px;margin:0 auto;padding:18px 24px 40px}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:10px}
   .mark{width:26px;height:26px;display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:none}
   .mark i{display:block;border-radius:5px}
   .mark i:nth-child(1){background:var(--teal)}
   .mark i:nth-child(2){background:var(--red)}
   .mark i:nth-child(3){background:var(--yel)}
   .mark i:nth-child(4){background:var(--steel)}
-  aside h1{font-size:17px;font-weight:800;letter-spacing:-.2px;margin:0;line-height:1.2;text-transform:lowercase}
-  label{display:block;font-size:12px;font-weight:500;color:var(--mut);margin:14px 0 4px}
-  input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit;background:rgba(27,64,121,.7);color:var(--tx);color-scheme:dark}
+  .bar h1{font-size:17px;font-weight:800;letter-spacing:-.2px;margin:0;line-height:1.2;text-transform:lowercase}
+  .meta{color:var(--mut);font-size:12px}
+
+  /* bar kontrol: tanggal, pencarian, semua tanggal */
+  .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  input{padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit;background:rgba(27,64,121,.7);color:var(--tx);color-scheme:dark}
   input::placeholder{color:var(--mut)}
   input:focus{outline:2px solid var(--yel);outline-offset:1px;border-color:var(--yel)}
-  label.ck{display:flex;align-items:center;gap:8px;margin:10px 0 0;cursor:pointer}
+  .ctl input[type=date]{width:160px}
+  .ctl input[type=search]{flex:1;min-width:220px}
+  label.ck{display:flex;align-items:center;gap:8px;margin:0;cursor:pointer;white-space:nowrap;font-size:12px;font-weight:500;color:var(--mut)}
   .ck input{width:16px;height:16px;padding:0;margin:0;accent-color:#F2B72E}
-  nav{margin-top:22px}
-  nav div{padding:9px 12px;border-radius:10px;color:var(--mut)}
-  nav div.on{background:var(--acbg);color:var(--yel);font-weight:700}
-  main{padding:26px}
-  .top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-  .top h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.3px}
-  .meta{color:var(--mut);font-size:12px}
-  .sum{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap}
-  .sum div{color:var(--ink);background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.3);border:1px solid var(--line);border-radius:14px;padding:11px 16px;min-width:140px}
-  .sum div:nth-child(1){border-top:4px solid var(--teal)}
-  .sum div:nth-child(2){border-top:4px solid var(--red)}
-  .sum div:nth-child(3){border-top:4px solid var(--yel)}
-  .sum small{display:block;color:var(--ink2);font-size:12px}
-  .sum b{font-size:22px;font-weight:700}
 
-  /* ringkasan per wilayah, tampil sebelum kartu ship to */
-  .wil{margin:0 0 24px}
+  /* ringkasan satu baris */
+  .sum{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap;color:var(--ink);background:var(--card);border-radius:12px;padding:9px 16px;margin-bottom:14px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .sum span{font-size:12px;color:var(--ink2)}
+  .sum b{font-size:18px;font-weight:700;color:var(--ink)}
+  .sum .sd{margin-left:auto;font-weight:700}
+
+  /* ringkasan per wilayah (6 teratas) */
+  .wil{margin:0 0 16px}
   .wil:empty{display:none}
-  .wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 10px}
-  .wh b{font-size:14px;font-weight:700}
-  .wh span{font-size:12px;color:var(--mut)}
-  .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
-  .wk{font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:14px;padding:11px 14px 12px;box-shadow:0 4px 14px rgba(0,0,0,.3);transition:transform .12s,box-shadow .12s}
-  .wk:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.34)}
+  .wh2{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+  .wh2 b{font-size:13px;font-weight:700}
+  .wh2 span{font-size:12px;color:var(--mut)}
+  .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+  .wk{font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:1px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:10px;padding:8px 11px;box-shadow:0 3px 10px rgba(0,0,0,.28);transition:transform .12s,box-shadow .12s;min-width:0}
+  .wk:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.32)}
   .wk:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
   .wk.on{outline:3px solid var(--yel);outline-offset:1px}
-  .wk .wn{font-size:12px;font-weight:700;line-height:1.3}
-  .wk .wv{font-size:22px;font-weight:700;line-height:1.2}
-  .wk .wv small{font-size:11px;font-weight:600;color:var(--ink2)}
-  .wk .wm,.wk .wp{font-size:11px;color:var(--ink2)}
-  .wk .wb{display:block;height:5px;border-radius:3px;background:#DDE3EC;margin-top:8px;overflow:hidden}
-  .wk .wb i{display:block;height:100%;background:var(--c);border-radius:3px}
+  .wk .wn{font-size:11px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wk .wv{font-size:18px;font-weight:700;line-height:1.25}
+  .wk .wm{font-size:11px;color:var(--ink2)}
+  .wk.more{align-items:center;justify-content:center;background:rgba(10,30,68,.55);color:var(--tx);border:1px dashed rgba(255,255,255,.4);font-size:12px;font-weight:700;box-shadow:none}
 
-  /* tampilan dikelompokkan: warehouse dan store */
-  .hdt{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.4px;margin:0 0 16px}
-  .grp{margin-bottom:24px}
-  .gh{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 10px;gap:8px;flex-wrap:wrap}
-  .gh b{font-size:14px;font-weight:700}
-  .gh span{font-size:12px;color:var(--mut)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-  .k2{background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.3);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;transition:transform .12s,box-shadow .12s}
-  .k2:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.22)}
+  /* tab warehouse / store */
+  .tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .tabs:empty,.ft:empty{display:none}
+  .tabs button,.ft button{font:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(10,30,68,.55);color:var(--tx);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .tabs button:hover,.ft button:hover{border-color:var(--yel)}
+  .tabs button.on{background:var(--yel);border-color:var(--yel);color:#1B2A4A}
+  .tabs button:focus-visible,.ft button:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+  .tabs small{font-size:11px;font-weight:700;opacity:.75;margin-left:4px}
+  .tabs .so{margin-left:auto;font-size:12px;color:var(--mut)}
+  .ft{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px;font-size:12px;color:var(--mut)}
+
+  /* kartu ship to ringkas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  .k2{background:var(--card);box-shadow:0 3px 10px rgba(0,0,0,.28);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:2px;cursor:pointer;transition:transform .12s,box-shadow .12s;min-width:0}
+  .k2:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.32)}
   .k2:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
-  .k2 .l{min-width:0}
   .k2 .a{font-size:11px;color:var(--ink2)}
-  .k2 .nm{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3}
-  .k2 .dt{font-size:11px;font-weight:700;color:var(--ink2);margin-top:3px}
-  .k2 .ord{font-size:11px;font-weight:700;color:#8A5A00;margin-top:3px;word-break:break-all}
-  .k2 .v{text-align:right;flex:none}
-  .k2 .v b{display:block;font-size:16px;font-weight:700;color:var(--ink)}
+  .k2 .nm{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3;min-height:2.6em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .k2 .dt{font-size:11px;font-weight:700;color:var(--ink2)}
+  .k2 .ord{font-size:11px;font-weight:700;color:#8A5A00;word-break:break-all}
+  .k2 .v{display:flex;justify-content:space-between;align-items:baseline;margin-top:4px}
+  .k2 .v b{font-size:15px;font-weight:700;color:var(--ink)}
   .k2 .v span{font-size:11px;color:var(--ink2)}
+  .bw{font-size:10px;font-weight:700;background:#DCE6F5;color:var(--ink);border-radius:4px;padding:0 5px;margin-left:6px}
 
   /* jendela detail order */
   .modal{display:none;position:fixed;inset:0;background:rgba(10,25,55,.68);z-index:10;padding:24px;overflow:auto}
@@ -145,37 +146,34 @@
   .pill{display:inline-block;padding:2px 8px;border-radius:10px;background:#FBE9B7;color:var(--ink);font-weight:600;font-size:11px}
   .pill.ok{background:#CFE5DE}
   .empty{padding:40px;text-align:center;color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:14px}
-  @media(max-width:720px){.wrap{grid-template-columns:1fr}}
+  @media(max-width:720px){.app{padding:14px}.sum .sd{margin-left:0}.tabs .so{margin-left:0}}
 </style>
 </head>
 <body>
 <div class="bgfx" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
-<div class="wrap">
-  <aside>
+<div class="app">
+  <header class="bar">
     <div class="brand">
       <div class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <h1>Dashboard pengiriman</h1>
     </div>
-    <label for="tgl">Tanggal pengiriman</label>
-    <input type="date" id="tgl">
-    <label for="cari">Cari</label>
-    <input type="search" id="cari" placeholder="Ship to, nama toko, atau order key">
+    <span class="meta" id="meta"></span>
+  </header>
+  <div class="ctl">
+    <input type="date" id="tgl" aria-label="Tanggal pengiriman">
+    <input type="search" id="cari" placeholder="Ship to, nama toko, atau order key" aria-label="Cari">
     <label class="ck"><input type="checkbox" id="semua" checked> Cari di semua tanggal</label>
-    <nav><div class="on">Ship to</div></nav>
-  </aside>
-  <main>
-    <div class="top">
-      <h2 id="judul">Ship to</h2>
-      <span class="meta" id="meta"></span>
-    </div>
-    <div class="sum">
-      <div><small>Jumlah ship to</small><b id="sShip">-</b></div>
-      <div><small>Jumlah order</small><b id="sOrd">-</b></div>
-      <div><small>Total CBM</small><b id="sCbm">-</b></div>
-    </div>
-    <div class="wil" id="wil" role="group" aria-label="Ringkasan per wilayah"></div>
-    <div id="out"><div class="empty">Memuat data...</div></div>
-  </main>
+  </div>
+  <div class="sum">
+    <span><b id="sShip">-</b> ship to</span>
+    <span><b id="sOrd">-</b> order</span>
+    <span><b id="sCbm">-</b> CBM</span>
+    <span class="sd" id="sTgl"></span>
+  </div>
+  <div class="wil" id="wil" role="group" aria-label="Ringkasan per wilayah"></div>
+  <div class="tabs" id="tabs" role="group" aria-label="Jenis tujuan"></div>
+  <div id="out"><div class="empty">Memuat data...</div></div>
+  <div class="ft" id="ft"></div>
 </div>
 <div id="modal" class="modal" aria-hidden="true">
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -192,6 +190,9 @@ let ADDR = {}; // alamat per ship to
 let WIL = {}; // wilayah per ship to (opsional; bisa juga kolom ke-9 di tiap baris)
 let HAS_WIL = false;
 let selWil = ''; // wilayah yang sedang dipilih, kosong = semua
+let tab = 'all'; // all | w (warehouse) | s (store)
+let showAllWil = false, showAllCards = false;
+const WIL_TOP = 6, CARD_LIMIT = 10;
 const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
 fetch(API).then(r => r.json()).then(d => {
@@ -231,18 +232,13 @@ const wilDari = r => String((WIL[r[1]] != null ? WIL[r[1]] : r[8]) || '').trim()
 // warehouse = kode berawalan H atau nama berawalan WH, selebihnya store
 const isWH = x => /^H/i.test(x.code) || /^WH\b/i.test(x.name);
 
-const kartu = (x, semua) =>
+const kartu = (x, semua, badge) =>
   '<div class="k2" tabindex="0" role="button" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '">' +
-  '<div class="l"><div class="a">' + esc(x.code) + '</div><div class="nm">' + esc(x.name) + '</div>' +
+  '<div class="a">' + esc(x.code) + (badge && isWH(x) ? '<span class="bw">WH</span>' : '') + '</div>' +
+  '<div class="nm">' + esc(x.name) + '</div>' +
   (semua ? '<div class="dt">' + labelTgl(x.date) + '</div>' : '') +
-  (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') + '</div>' +
+  (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') +
   '<div class="v"><b>' + fmt(x.cbm, 2) + '</b><span>' + x.n + ' order</span></div></div>';
-
-const grup = (judul, arr, semua) => arr.length
-  ? '<section class="grp"><div class="gh"><b>' + judul + '</b><span>' + fmt(arr.length, 0) +
-    (semua ? ' pengiriman' : ' ship to') + ' · ' + fmt(arr.reduce((s, x) => s + x.cbm, 0), 2) + ' CBM</span></div>' +
-    '<div class="grid">' + arr.map(x => kartu(x, semua)).join('') + '</div></section>'
-  : '';
 
 function render() {
   const tgl = document.getElementById('tgl').value;
@@ -250,13 +246,15 @@ function render() {
   const out = document.getElementById('out');
   // semua tanggal: tanggal kosong, atau ada pencarian dan kotak "Cari di semua tanggal" dicentang
   const semua = !tgl || (!!q && document.getElementById('semua').checked);
-  document.getElementById('judul').textContent = (q && semua) ? 'Ship to · semua tanggal' : 'Ship to';
 
   if (semua && !q) {
     document.getElementById('sShip').textContent = '-';
     document.getElementById('sOrd').textContent = '-';
     document.getElementById('sCbm').textContent = '-';
     document.getElementById('wil').innerHTML = '';
+    document.getElementById('tabs').innerHTML = '';
+    document.getElementById('ft').innerHTML = '';
+    document.getElementById('sTgl').textContent = '';
     out.innerHTML = pesan('Pilih tanggal pengiriman, atau ketik ship to / nama toko untuk mencari di semua tanggal.');
     return;
   }
@@ -276,7 +274,7 @@ function render() {
   // order key yang cocok dengan pencarian, ditampilkan di kartu
   list.forEach(x => { x.hit = q ? x.exts.filter(s => s.toLowerCase().includes(q)) : []; });
 
-  // ringkasan per wilayah: dihitung dari hasil tanggal/pencarian saat ini, sebelum disaring wilayah
+  // ringkasan per wilayah (6 teratas), dihitung dari hasil tanggal/pencarian saat ini, sebelum disaring wilayah
   const wEl = document.getElementById('wil');
   if (!HAS_WIL) {
     wEl.innerHTML = '';
@@ -289,19 +287,21 @@ function render() {
     });
     if (selWil && !(selWil in wc)) selWil = '';
     const wk = Object.keys(wc).sort((a, b) => ((a === NO_WIL) - (b === NO_WIL)) || wc[b].cbm - wc[a].cbm);
-    const tot = list.reduce((s, x) => s + x.cbm, 0) || 1;
+    const sisa = wk.length - WIL_TOP;
+    let shown = showAllWil ? wk : wk.slice(0, WIL_TOP);
+    if (selWil && !shown.includes(selWil)) shown = shown.concat(selWil);
     const warna = ['--teal', '--red', '--yel', '--steel'];
-    wEl.innerHTML = '<div class="wh"><b>Ringkasan per wilayah</b><span>' +
-      (selWil ? 'Menampilkan ' + esc(selWil) + ' · klik lagi untuk semua' : 'Klik wilayah untuk menyaring ship to') + '</span></div>' +
-      '<div class="wgrid">' + wk.map((w, i) => {
-        const a = wc[w], pc = Math.round(a.cbm / tot * 100);
+    wEl.innerHTML = '<div class="wh2"><b>Wilayah</b><span>' +
+      (selWil ? 'Menampilkan ' + esc(selWil) + ' · klik lagi untuk semua'
+        : (showAllWil || sisa <= 0 ? 'Klik wilayah untuk menyaring ship to' : WIL_TOP + ' teratas berdasarkan CBM')) + '</span></div>' +
+      '<div class="wgrid">' + shown.map((w, i) => {
+        const a = wc[w];
         return '<button type="button" class="wk' + (w === selWil ? ' on' : '') + '" style="--c:var(' + warna[i % 4] + ')" data-w="' + esc(w) +
-          '" aria-pressed="' + (w === selWil) + '"><span class="wn">' + esc(w) + '</span>' +
-          '<span class="wv">' + fmt(a.cbm, 2) + '<small> CBM</small></span>' +
-          '<span class="wm">' + fmt(a.ship, 0) + ' ship to · ' + fmt(a.n, 0) + ' order</span>' +
-          '<span class="wb"><i style="width:' + Math.max(pc, 2) + '%"></i></span>' +
-          '<span class="wp">' + pc + '% dari total CBM</span></button>';
-      }).join('') + '</div>';
+          '" aria-pressed="' + (w === selWil) + '" title="' + a.ship + ' ship to · ' + a.n + ' order · ' + fmt(a.cbm, 2) + ' CBM">' +
+          '<span class="wn">' + esc(w) + '</span><span class="wv">' + fmt(a.cbm, 2) + '</span>' +
+          '<span class="wm">' + fmt(a.ship, 0) + ' ship to</span></button>';
+      }).join('') +
+      (sisa > 0 ? '<button type="button" class="wk more" data-more="1">' + (showAllWil ? 'Tutup' : '+' + sisa + ' lainnya') + '</button>' : '') + '</div>';
     if (selWil) list = list.filter(x => (x.wil || NO_WIL) === selWil);
   }
 
@@ -313,16 +313,35 @@ function render() {
   document.getElementById('sShip').textContent = fmt(list.length, 0);
   document.getElementById('sOrd').textContent = fmt(totOrd, 0);
   document.getElementById('sCbm').textContent = fmt(totCbm, 2);
+  document.getElementById('sTgl').textContent = semua ? 'Semua tanggal' : labelTgl(tgl);
 
+  const tabsEl = document.getElementById('tabs'), ftEl = document.getElementById('ft');
   if (!list.length) {
+    tabsEl.innerHTML = ''; ftEl.innerHTML = '';
     out.innerHTML = pesan(semua ? 'Ship to atau order key tidak ditemukan.' :
       (q ? 'Ship to atau order key tidak ditemukan pada tanggal ini. Centang "Cari di semua tanggal" untuk mencari di tanggal lain.'
          : 'Tidak ada pengiriman pada tanggal ini.'));
     return;
   }
-  out.innerHTML = (semua ? '' : '<div class="hdt">' + labelTgl(tgl) + '</div>') +
-    grup('Warehouse', list.filter(isWH), semua) +
-    grup('Store', list.filter(x => !isWH(x)), semua);
+
+  // tab Semua / Warehouse / Store
+  const nW = list.filter(isWH).length;
+  const cnt = {all: list.length, w: nW, s: list.length - nW};
+  tabsEl.innerHTML = [['all', 'Semua'], ['w', 'Warehouse'], ['s', 'Store']].map(t =>
+    '<button type="button" data-t="' + t[0] + '" class="' + (tab === t[0] ? 'on' : '') + '" aria-pressed="' + (tab === t[0]) + '">' +
+    t[1] + '<small>' + fmt(cnt[t[0]], 0) + '</small></button>').join('') +
+    '<span class="so">' + (semua ? 'Urut: tanggal terbaru' : 'Urut: CBM terbesar') + '</span>';
+
+  // kartu ship to: 10 teratas, sisanya lewat tombol "Tampilkan semua"
+  const vis = tab === 'w' ? list.filter(isWH) : tab === 's' ? list.filter(x => !isWH(x)) : list;
+  const tampil = showAllCards ? vis : vis.slice(0, CARD_LIMIT);
+  out.innerHTML = vis.length
+    ? '<div class="grid">' + tampil.map(x => kartu(x, semua, tab === 'all')).join('') + '</div>'
+    : pesan('Tidak ada ship to pada tab ini.');
+  ftEl.innerHTML = vis.length
+    ? 'Menampilkan ' + fmt(tampil.length, 0) + ' dari ' + fmt(vis.length, 0) + ' ship to' +
+      (vis.length > CARD_LIMIT ? '<button type="button" id="more">' + (showAllCards ? 'Tampilkan lebih sedikit' : 'Tampilkan semua') + '</button>' : '')
+    : '';
 }
 
 const num = v => typeof v === 'number' ? v : (parseFloat(String(v == null ? '' : v).replace(',', '.')) || 0);
@@ -432,19 +451,37 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') tutup(); });
 document.getElementById('tgl').addEventListener('change', () => {
   // memilih tanggal = filter tanggal berlaku, jadi centang "semua tanggal" dilepas
   if (document.getElementById('tgl').value) document.getElementById('semua').checked = false;
+  showAllCards = false;
   render();
 });
 document.getElementById('wil').addEventListener('click', e => {
   const b = e.target.closest('.wk');
   if (!b) return;
-  const w = b.dataset.w;
-  selWil = (w === selWil) ? '' : w;
-  render();
-  const nb = [...document.querySelectorAll('#wil .wk')].find(x => x.dataset.w === w);
+  if (b.dataset.more) { showAllWil = !showAllWil; render(); }
+  else {
+    const w = b.dataset.w;
+    selWil = (w === selWil) ? '' : w;
+    showAllCards = false;
+    render();
+  }
+  const nb = [...document.querySelectorAll('#wil .wk')].find(x => b.dataset.more ? x.dataset.more : x.dataset.w === b.dataset.w);
   if (nb) nb.focus();
 });
-document.getElementById('semua').addEventListener('change', render);
-document.getElementById('cari').addEventListener('input', render);
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-t]');
+  if (!b) return;
+  tab = b.dataset.t; showAllCards = false; render();
+  const nb = document.querySelector('#tabs button[data-t="' + tab + '"]');
+  if (nb) nb.focus();
+});
+document.getElementById('ft').addEventListener('click', e => {
+  if (!e.target.closest('#more')) return;
+  showAllCards = !showAllCards; render();
+  const nb = document.getElementById('more');
+  if (nb) nb.focus();
+});
+document.getElementById('semua').addEventListener('change', () => { showAllCards = false; render(); });
+document.getElementById('cari').addEventListener('input', () => { showAllCards = false; render(); });
 
 </script>
 </body>
