@@ -104,18 +104,24 @@
   .tabs .so{margin-left:auto;font-size:12px;color:var(--mut)}
   .ft{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px;font-size:12px;color:var(--mut)}
 
-  /* kartu ship to ringkas */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-  .k2{background:var(--card);box-shadow:0 3px 10px rgba(0,0,0,.28);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:2px;cursor:pointer;transition:transform .12s,box-shadow .12s;min-width:0}
-  .k2:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.32)}
-  .k2:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
-  .k2 .a{font-size:11px;color:var(--ink2)}
-  .k2 .nm{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3;min-height:2.6em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .k2 .dt{font-size:11px;font-weight:700;color:var(--ink2)}
-  .k2 .ord{font-size:11px;font-weight:700;color:#8A5A00;word-break:break-all}
-  .k2 .v{display:flex;justify-content:space-between;align-items:baseline;margin-top:4px}
-  .k2 .v b{font-size:15px;font-weight:700;color:var(--ink)}
-  .k2 .v span{font-size:11px;color:var(--ink2)}
+  /* daftar ship to berbentuk tabel */
+  .tw2{overflow-x:auto;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .tbl{width:100%;border-collapse:collapse;background:var(--card);color:var(--ink);font-size:12px}
+  .tbl th{background:var(--ink);color:#fff;text-align:left;padding:9px 12px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
+  .tbl th:hover{background:var(--bg)}
+  .tbl th:focus-visible{outline:2px solid var(--yel);outline-offset:-2px}
+  .tbl th.r,.tbl td.r{text-align:right}
+  .tbl th .ar{font-size:9px;margin-left:5px;color:var(--yel)}
+  .tbl td{padding:8px 12px;border-top:1px solid #E3E8F0;vertical-align:middle}
+  .tbl tbody tr:nth-child(even) td{background:#F7F9FC}
+  .tbl tr.k2{cursor:pointer}
+  .tbl tr.k2:hover td{background:#E6EDF8}
+  .tbl tr.k2:focus-visible{outline:2px solid var(--yel);outline-offset:-2px}
+  .tbl .cd{color:var(--ink2);white-space:nowrap}
+  .tbl .nm{font-weight:700;line-height:1.35}
+  .tbl .ord{font-size:11px;font-weight:700;color:#8A5A00;word-break:break-all;margin-top:2px}
+  .tbl .cn{white-space:nowrap}
+  .tbl .cb{font-weight:700;font-size:13px;white-space:nowrap}
   .bw{font-size:10px;font-weight:700;background:#DCE6F5;color:var(--ink);border-radius:4px;padding:0 5px;margin-left:6px}
 
   /* jendela detail order */
@@ -146,7 +152,7 @@
   .pill{display:inline-block;padding:2px 8px;border-radius:10px;background:#FBE9B7;color:var(--ink);font-weight:600;font-size:11px}
   .pill.ok{background:#CFE5DE}
   .empty{padding:40px;text-align:center;color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:14px}
-  @media(max-width:720px){.app{padding:14px}.sum .sd{margin-left:0}.tabs .so{margin-left:0}}
+  @media(max-width:720px){.tbl .cw{display:none}.app{padding:14px}.sum .sd{margin-left:0}.tabs .so{margin-left:0}}
 </style>
 </head>
 <body>
@@ -193,7 +199,8 @@ let selWil = ''; // wilayah yang sedang dipilih, kosong = semua
 let tab = 'all'; // all | w (warehouse) | s (store)
 let showAllWil = false, showAllCards = false;
 let datePicked = false; // true setelah pengguna memilih tanggal sendiri
-const WIL_TOP = 6, CARD_LIMIT = 12;
+const WIL_TOP = 6, ROW_LIMIT = 15;
+let sortKey = '', sortDir = 'desc'; // urutan kolom yang diklik; kosong = urutan bawaan
 const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
 fetch(API).then(r => r.json()).then(d => {
@@ -233,13 +240,34 @@ const wilDari = r => String((WIL[r[1]] != null ? WIL[r[1]] : r[8]) || '').trim()
 // warehouse = kode berawalan H atau nama berawalan WH, selebihnya store
 const isWH = x => /^H/i.test(x.code) || /^WH\b/i.test(x.name);
 
-const kartu = (x, semua, badge) =>
-  '<div class="k2" tabindex="0" role="button" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '">' +
-  '<div class="a">' + esc(x.code) + (badge && isWH(x) ? '<span class="bw">WH</span>' : '') + '</div>' +
-  '<div class="nm">' + esc(x.name) + '</div>' +
-  (semua && x.zone !== 'LK' ? '<div class="dt">' + labelTgl(x.date) + '</div>' : '') + // zone LK: tanpa tulisan PENGIRIMAN TANGGAL
-  (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') +
-  '<div class="v"><b>' + fmt(x.cbm, 2) + '</b><span>' + x.n + ' order</span></div></div>';
+const KOL = {code: 'Kode', name: 'Ship to', wil: 'Wilayah', date: 'Tanggal', n: 'Order', cbm: 'CBM'};
+const fmtTgl = t => { const p = t.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; };
+const urut = arr => arr.slice().sort((a, b) => {
+  const va = a[sortKey], vb = b[sortKey];
+  const c = (typeof va === 'number' && typeof vb === 'number') ? va - vb
+    : String(va == null ? '' : va).localeCompare(String(vb == null ? '' : vb), 'id', {numeric: true});
+  return sortDir === 'asc' ? c : -c;
+});
+
+// daftar ship to berbentuk tabel; kolom Tanggal hanya muncul saat mencari di semua tanggal
+const tabel = (arr, semua, badge) => {
+  const cols = ['code', 'name'].concat(HAS_WIL ? ['wil'] : [], semua ? ['date'] : [], ['n', 'cbm']);
+  const th = k => '<th tabindex="0" data-s="' + k + '" class="' + (k === 'n' || k === 'cbm' ? 'r' : k === 'wil' ? 'cw' : '') +
+    '" aria-sort="' + (sortKey === k ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none') + '">' + KOL[k] +
+    (sortKey === k ? '<span class="ar">' + (sortDir === 'asc' ? '▲' : '▼') + '</span>' : '') + '</th>';
+  const td = (x, k) => {
+    if (k === 'code') return '<td class="cd">' + esc(x.code) + (badge && isWH(x) ? '<span class="bw">WH</span>' : '') + '</td>';
+    if (k === 'name') return '<td><div class="nm">' + esc(x.name) + '</div>' +
+      (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') + '</td>';
+    if (k === 'wil') return '<td class="cw cd">' + esc(x.wil || '-') + '</td>';
+    if (k === 'date') return '<td class="cd">' + (x.zone === 'LK' ? '-' : fmtTgl(x.date)) + '</td>'; // zone LK: tanggal tidak ditampilkan
+    if (k === 'n') return '<td class="r cn">' + fmt(x.n, 0) + '</td>';
+    return '<td class="r cb">' + fmt(x.cbm, 2) + '</td>';
+  };
+  return '<div class="tw2"><table class="tbl"><thead><tr>' + cols.map(th).join('') + '</tr></thead><tbody>' +
+    arr.map(x => '<tr class="k2" tabindex="0" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '">' + cols.map(k => td(x, k)).join('') + '</tr>').join('') +
+    '</tbody></table></div>';
+};
 
 function render() {
   const tgl = document.getElementById('tgl').value;
@@ -332,19 +360,21 @@ function render() {
   tabsEl.innerHTML = [['all', 'Semua'], ['w', 'Warehouse'], ['s', 'Store']].map(t =>
     '<button type="button" data-t="' + t[0] + '" class="' + (tab === t[0] ? 'on' : '') + '" aria-pressed="' + (tab === t[0]) + '">' +
     t[1] + '<small>' + fmt(cnt[t[0]], 0) + '</small></button>').join('') +
-    '<span class="so">' + (semua ? 'Urut: tanggal terbaru' : 'Urut: CBM terbesar') + '</span>';
+    '<span class="so">' + (sortKey ? 'Urut: ' + KOL[sortKey] + (sortDir === 'asc' ? ' naik' : ' turun')
+      : (semua ? 'Urut: tanggal terbaru' : 'Urut: CBM terbesar')) + '</span>';
 
-  // kartu ship to: 10 teratas, sisanya lewat tombol "Tampilkan semua"
-  const vis = tab === 'w' ? list.filter(isWH) : tab === 's' ? list.filter(x => !isWH(x)) : list;
+  // daftar ship to: 15 baris teratas, sisanya lewat tombol "Tampilkan semua"
+  let vis = tab === 'w' ? list.filter(isWH) : tab === 's' ? list.filter(x => !isWH(x)) : list;
+  if (sortKey) vis = urut(vis);
   // ada pencarian atau tanggal sudah dipilih: tampilkan semua hasil, tanpa batas 10
   const paksa = !!q || datePicked;
-  const tampil = (showAllCards || paksa) ? vis : vis.slice(0, CARD_LIMIT);
+  const tampil = (showAllCards || paksa) ? vis : vis.slice(0, ROW_LIMIT);
   out.innerHTML = vis.length
-    ? '<div class="grid">' + tampil.map(x => kartu(x, semua, tab === 'all')).join('') + '</div>'
+    ? tabel(tampil, semua, tab === 'all')
     : pesan('Tidak ada ship to pada tab ini.');
   ftEl.innerHTML = vis.length
     ? 'Menampilkan ' + fmt(tampil.length, 0) + ' dari ' + fmt(vis.length, 0) + ' ship to' +
-      (vis.length > CARD_LIMIT && !paksa ? '<button type="button" id="more">' + (showAllCards ? 'Tampilkan lebih sedikit' : 'Tampilkan semua') + '</button>' : '')
+      (vis.length > ROW_LIMIT && !paksa ? '<button type="button" id="more">' + (showAllCards ? 'Tampilkan lebih sedikit' : 'Tampilkan semua') + '</button>' : '')
     : '';
 }
 
@@ -439,12 +469,24 @@ function bukaDetail(date, code) {
 }
 
 const outEl = document.getElementById('out');
+const urutKlik = th => {
+  const k = th.dataset.s;
+  if (sortKey === k) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortKey = k; sortDir = (k === 'n' || k === 'cbm') ? 'desc' : 'asc'; }
+  render();
+  const nh = document.querySelector('#out th[data-s="' + k + '"]');
+  if (nh) nh.focus();
+};
 outEl.addEventListener('click', e => {
+  const t = e.target.closest('th[data-s]');
+  if (t) { urutKlik(t); return; }
   const b = e.target.closest('.k2');
   if (b) bukaDetail(b.dataset.d, b.dataset.c);
 });
 outEl.addEventListener('keydown', e => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
+  const t = e.target.closest('th[data-s]');
+  if (t) { e.preventDefault(); urutKlik(t); return; }
   const b = e.target.closest('.k2');
   if (b) { e.preventDefault(); bukaDetail(b.dataset.d, b.dataset.c); }
 });
