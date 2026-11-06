@@ -143,14 +143,20 @@
   .tw td{padding:7px 10px;border-top:1px solid #E3E8F0;white-space:nowrap;color:var(--ink)}
   .tw tr:nth-child(even) td{background:#F7F9FC}
   .tw tr.hl td{background:#FFF1BF}
-  .tw tr.gr td{background:#E6EDF8;border-top:2px solid var(--ink);padding:9px 10px;white-space:normal}
+  .tw tr.gr td{background:#E6EDF8;border-top:1px solid #C9D6EA;padding:10px;white-space:normal;vertical-align:middle;font-weight:600}
   .tw tr.gr{cursor:pointer}
   .tw tr.gr:hover td{background:#D6E2F5}
   .tw tr.gr:focus-visible{outline:2px solid var(--yel);outline-offset:-2px}
-  .gi .cv{align-self:center;font-size:12px;color:var(--ink);transition:transform .15s}
-  .grp.open .cv{transform:rotate(90deg)}
-  .grp:not(.open) tr.o{display:none}
-  .tw:has(.grp):not(:has(.grp.open)) thead{display:none}
+  .tw tr.gr td.cv{width:28px;padding-right:0;color:var(--ink);font-size:11px;text-align:center}
+  .tw tr.gr td.r,.tw th.r{text-align:right;white-space:nowrap}
+  .tw tr.gr td.cp{width:110px;white-space:nowrap}
+  .tw tr.gr td.cs{width:110px}
+  .grp.open tr.gr td.cv span{display:inline-block;transform:rotate(90deg)}
+  .grp.open tr.gr td{background:#D6E2F5}
+  .grp:not(.open) tr.od{display:none}
+  .tw tr.od>td{padding:0 0 0 28px;background:#fff;border-top:0;white-space:normal}
+  .tw .ot{width:100%}
+  .tw .ot th{position:static;background:#F0F4FA;color:var(--ink2);font-size:11px;padding:6px 10px}
   .gi{display:flex;flex-wrap:wrap;gap:6px 28px;align-items:flex-start}
   .gi span{display:flex;flex-direction:column;gap:1px;min-width:0}
   .gi small{font-size:10px;font-weight:600;color:var(--ink2)}
@@ -448,7 +454,10 @@ function bukaDetail(date, code) {
       // kelompokkan per shipping detail + transport driver + assistant driver
       // ringkasan dulu: satu baris per (tanggal +) shipping detail + transport driver + assistant driver; order muncul setelah diklik
       const showDt = date === '*' && x.zone !== 'LK';
+      const NC = showDt ? 7 : 6;
       let isi, nGrp = 0;
+      const ot = LL => '<table class="ot"><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
+        '<th style="text-align:right">CBM</th></tr></thead><tbody>' + LL.map((o, i) => baris(o, i)).join('') + '</tbody></table>';
       if (d.hasShip) {
         const G = {};
         L.forEach(o => {
@@ -461,23 +470,23 @@ function bukaDetail(date, code) {
         nGrp = gl.length;
         isi = gl.map(g => {
           const buka = !!qq && g.o.some(o => String(o.ext).toLowerCase().includes(qq)); // order yang dicari langsung terbuka
-          return '<tbody class="grp' + (buka ? ' open' : '') + '"><tr class="gr" tabindex="0" role="button" aria-expanded="' + buka + '"><td colspan="5"><div class="gi">' +
-            '<span class="cv" aria-hidden="true">&#9656;</span>' +
-            (showDt ? '<span><small>' + (g.dt > hariIni() ? 'Plan pengiriman tanggal' : 'Pengiriman tanggal') + '</small><b>' + fmtTgl(g.dt) + '</b></span>' : '') +
-            '<span><small>Shipping detail</small><b>' + txt(g.sd) + '</b></span>' +
-            '<span><small>Transport driver</small><b>' + txt(g.td) + '</b></span>' +
-            '<span><small>Assistant driver</small><b>' + txt(g.ad) + '</b></span>' +
-            '<span class="gc">' + fmt(g.o.length, 0) + ' order · ' + fmt(g.cbm, 2) + ' CBM</span></div></td></tr>' +
-            g.o.map((o, i) => baris(o, i)).join('') + '</tbody>';
+          return '<tbody class="grp' + (buka ? ' open' : '') + '"><tr class="gr" tabindex="0" role="button" aria-expanded="' + buka + '">' +
+            '<td class="cv" aria-hidden="true"><span>&#9656;</span></td>' +
+            (showDt ? '<td class="cp">' + (g.dt > hariIni() ? '<small>PLAN</small> ' : '') + fmtTgl(g.dt) + '</td>' : '') +
+            '<td class="cs">' + txt(g.sd) + '</td><td>' + txt(g.td) + '</td><td>' + txt(g.ad) + '</td>' +
+            '<td class="r">' + fmt(g.o.length, 0) + ' order<br><span style="font-weight:700">' + fmt(g.cbm, 2) + ' CBM</span></td></tr>' +
+            '<tr class="od"><td colspan="' + NC + '">' + ot(g.o) + '</td></tr></tbody>';
         }).join('');
       } else {
         isi = '<tbody>' + L.map((o, i) => baris(o, i)).join('') + '</tbody>';
       }
+      const kepala = d.hasShip
+        ? '<tr><th></th>' + (showDt ? '<th>Pengiriman tanggal</th>' : '') + '<th>Shipping detail</th><th>Transport driver</th><th>Assistant driver</th><th class="r">Total</th></tr>'
+        : '<tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th><th style="text-align:right">CBM</th></tr>';
       mBody.innerHTML = head + alamat +
         '<div class="chips">' + (date === '*' ? '<span>' + fmt(Object.keys(x.dates).length, 0) + ' tanggal</span>' : '') + '<span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span>' +
         (nGrp > 1 ? '<span>' + fmt(nGrp, 0) + ' kelompok</span>' : '') + '</div>' +
-        (d.hasShip ? '<div class="adr">Klik salah satu baris untuk melihat daftar order.</div>' : '') + '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
-        '<th style="text-align:right">CBM</th></tr></thead>' + isi + '</table></div>';
+        (d.hasShip ? '<div class="adr">Klik salah satu baris untuk melihat daftar order.</div>' : '') + '<div class="tw"><table><thead>' + kepala + '</thead>' + isi + '</table></div>';
       const hl1 = mBody.querySelector('tr.hl');
       if (hl1) hl1.scrollIntoView({block: 'center'});
     })
