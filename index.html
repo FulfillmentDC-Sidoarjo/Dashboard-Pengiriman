@@ -192,6 +192,7 @@ let HAS_WIL = false;
 let selWil = ''; // wilayah yang sedang dipilih, kosong = semua
 let tab = 'all'; // all | w (warehouse) | s (store)
 let showAllWil = false, showAllCards = false;
+let datePicked = false; // true setelah pengguna memilih tanggal sendiri
 const WIL_TOP = 6, CARD_LIMIT = 10;
 const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
@@ -255,7 +256,8 @@ function render() {
     document.getElementById('tabs').innerHTML = '';
     document.getElementById('ft').innerHTML = '';
     document.getElementById('sTgl').textContent = '';
-    out.innerHTML = pesan('Pilih tanggal pengiriman, atau ketik ship to / nama toko untuk mencari di semua tanggal.');
+    out.innerHTML = pesan(ROWS.length ? 'Pilih tanggal pengiriman, atau ketik ship to / nama toko untuk mencari di semua tanggal.'
+      : 'Belum ada data dengan TYPE yang ditampilkan. Cek kolom H di spreadsheet dan daftar TYPE_TAMPIL di Code.gs.');
     return;
   }
 
@@ -334,13 +336,15 @@ function render() {
 
   // kartu ship to: 10 teratas, sisanya lewat tombol "Tampilkan semua"
   const vis = tab === 'w' ? list.filter(isWH) : tab === 's' ? list.filter(x => !isWH(x)) : list;
-  const tampil = showAllCards ? vis : vis.slice(0, CARD_LIMIT);
+  // ada pencarian atau tanggal sudah dipilih: tampilkan semua hasil, tanpa batas 10
+  const paksa = !!q || datePicked;
+  const tampil = (showAllCards || paksa) ? vis : vis.slice(0, CARD_LIMIT);
   out.innerHTML = vis.length
     ? '<div class="grid">' + tampil.map(x => kartu(x, semua, tab === 'all')).join('') + '</div>'
     : pesan('Tidak ada ship to pada tab ini.');
   ftEl.innerHTML = vis.length
     ? 'Menampilkan ' + fmt(tampil.length, 0) + ' dari ' + fmt(vis.length, 0) + ' ship to' +
-      (vis.length > CARD_LIMIT ? '<button type="button" id="more">' + (showAllCards ? 'Tampilkan lebih sedikit' : 'Tampilkan semua') + '</button>' : '')
+      (vis.length > CARD_LIMIT && !paksa ? '<button type="button" id="more">' + (showAllCards ? 'Tampilkan lebih sedikit' : 'Tampilkan semua') + '</button>' : '')
     : '';
 }
 
@@ -451,6 +455,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') tutup(); });
 document.getElementById('tgl').addEventListener('change', () => {
   // memilih tanggal = filter tanggal berlaku, jadi centang "semua tanggal" dilepas
   if (document.getElementById('tgl').value) document.getElementById('semua').checked = false;
+  datePicked = true;
   showAllCards = false;
   render();
 });
