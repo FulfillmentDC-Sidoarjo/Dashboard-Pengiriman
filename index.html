@@ -49,7 +49,7 @@
   @keyframes drift{to{transform:translate3d(75vw,45vh,0)}}
   @media (prefers-reduced-motion:reduce){.bgfx i,.bgfx b,.bgfx::after{animation:none}.bgfx i:nth-child(1){opacity:1;transform:none}}
 
-  .app{max-width:1500px;margin:0 auto;padding:18px 24px 40px}
+  .app{max-width:1120px;margin:0 auto;padding:18px 20px 40px}
   .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .brand{display:flex;align-items:center;gap:10px}
   .mark{width:26px;height:26px;display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:none}
@@ -105,7 +105,7 @@
   .ft{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px;font-size:12px;color:var(--mut)}
 
   /* kartu ship to ringkas */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
   .k2{background:var(--card);box-shadow:0 3px 10px rgba(0,0,0,.28);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:2px;cursor:pointer;transition:transform .12s,box-shadow .12s;min-width:0}
   .k2:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.32)}
   .k2:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
@@ -193,7 +193,7 @@ let selWil = ''; // wilayah yang sedang dipilih, kosong = semua
 let tab = 'all'; // all | w (warehouse) | s (store)
 let showAllWil = false, showAllCards = false;
 let datePicked = false; // true setelah pengguna memilih tanggal sendiri
-const WIL_TOP = 6, CARD_LIMIT = 10;
+const WIL_TOP = 6, CARD_LIMIT = 12;
 const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 
 fetch(API).then(r => r.json()).then(d => {
