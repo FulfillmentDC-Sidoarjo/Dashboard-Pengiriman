@@ -144,6 +144,8 @@
   .tw tr:nth-child(even) td{background:#F7F9FC}
   .tw tr.hl td{background:#FFF1BF}
   .tw tr.gr td{background:#E6EDF8;border-top:2px solid var(--ink);padding:9px 10px;white-space:normal}
+  .tw tr.dh td{background:var(--ink);color:#fff;border-top:0;padding:9px 10px;white-space:normal}
+  .tw tr.dh td span{float:right;font-weight:600;font-size:11px;opacity:.9}
   .gi{display:flex;flex-wrap:wrap;gap:6px 28px;align-items:flex-start}
   .gi span{display:flex;flex-direction:column;gap:1px;min-width:0}
   .gi small{font-size:10px;font-weight:600;color:var(--ink2)}
@@ -260,12 +262,12 @@ const tabel = (arr, semua, badge) => {
     if (k === 'name') return '<td><div class="nm">' + esc(x.name) + '</div>' +
       (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') + '</td>';
     if (k === 'wil') return '<td class="cw cd">' + esc(x.wil || '-') + '</td>';
-    if (k === 'date') return '<td class="cd">' + (x.zone === 'LK' ? '-' : fmtTgl(x.date)) + '</td>'; // zone LK: tanggal tidak ditampilkan
+    if (k === 'date') return '<td class="cd">' + (x.zone === 'LK' ? '-' : fmtTgl(x.date) + (x.d === '*' && Object.keys(x.dates).length > 1 ? '<span class="bw">' + Object.keys(x.dates).length + ' tgl</span>' : '')) + '</td>'; // zone LK: tanggal tidak ditampilkan
     if (k === 'n') return '<td class="r cn">' + fmt(x.n, 0) + '</td>';
     return '<td class="r cb">' + fmt(x.cbm, 2) + '</td>';
   };
   return '<div class="tw2"><table class="tbl"><thead><tr>' + cols.map(th).join('') + '</tr></thead><tbody>' +
-    arr.map(x => '<tr class="k2" tabindex="0" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '">' + cols.map(k => td(x, k)).join('') + '</tr>').join('') +
+    arr.map(x => '<tr class="k2" tabindex="0" data-d="' + esc(x.d) + '" data-c="' + esc(x.code) + '">' + cols.map(k => td(x, k)).join('') + '</tr>').join('') +
     '</tbody></table></div>';
 };
 
@@ -292,9 +294,12 @@ function render() {
   const map = {};
   ROWS.forEach(r => {
     if (!semua && r[0] !== tgl) return;
-    const k = r[0] + '|' + r[1];
-    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], wil: wilDari(r), zone: '', exts: [], n: 0, cbm: 0});
-    map[k].n++; map[k].cbm += r[4]; if (!map[k].zone && r[12]) map[k].zone = String(r[12]).trim().toUpperCase(); if (r[5]) map[k].exts.push(String(r[5]));
+    // semua tanggal: satu baris per ship to (semua tanggal digabung); satu tanggal: satu baris per ship to
+    const k = semua ? r[1] : r[0] + '|' + r[1];
+    const m = (map[k] = map[k] || {d: semua ? '*' : r[0], date: r[0], dates: {}, code: r[1], name: r[2], city: r[3], wil: wilDari(r), zone: '', exts: [], n: 0, cbm: 0});
+    if (r[0] > m.date) m.date = r[0]; // tanggal terbaru
+    m.dates[r[0]] = 1;
+    m.n++; m.cbm += r[4]; if (!m.zone && r[12]) m.zone = String(r[12]).trim().toUpperCase(); if (r[5]) m.exts.push(String(r[5]));
   });
   let list = Object.values(map).filter(x =>
     !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q) ||
@@ -336,7 +341,7 @@ function render() {
   }
 
   Object.keys(CUR).forEach(k => delete CUR[k]);
-  list.forEach(x => { CUR[x.date + '|' + x.code] = x; });
+  list.forEach(x => { CUR[x.d + '|' + x.code] = x; });
 
   const totOrd = list.reduce((s, x) => s + x.n, 0);
   const totCbm = list.reduce((s, x) => s + x.cbm, 0);
@@ -397,11 +402,11 @@ function tutup() {
 
 // detail diambil dari data yang sudah dimuat, jadi tanpa menunggu server
 function detailDari(date, code) {
-  const L = ROWS.filter(r => r[0] === date && r[1] === code);
+  const L = ROWS.filter(r => (date === '*' || r[0] === date) && r[1] === code);
   if (L.length && L[0].length < 8) return {}; // Code.gs lama belum mengirim detail
   const s = v => String(v == null ? '' : v).trim();
   return {hasShip: L.length > 0 && L[0].length >= 12,
-    details: L.map(r => ({ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code],
+    details: L.map(r => ({dt: r[0], ext: r[5], status: r[6], fulfillment: r[7], cbm: r[4], address: ADDR[code],
       sd: s(r[9]), td: s(r[10]), ad: s(r[11])}))};
 }
 
@@ -411,7 +416,7 @@ function bukaDetail(date, code) {
   const my = ++reqId;
   const head = '<div class="mh"><div class="mhl"><div class="code">' + esc(x.code) + '</div>' +
     '<h3 id="mTitle">' + esc(x.name) + '</h3>' +
-    (x.zone !== 'LK' ? '<div class="tg">' + labelTgl(x.date) + '</div>' : '') + '</div></div>';
+    (x.zone !== 'LK' ? '<div class="tg">' + (date === '*' ? fmt(Object.keys(x.dates).length, 0) + ' tanggal pengiriman' : labelTgl(x.date)) + '</div>' : '') + '</div></div>';
   mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Memuat detail order...</div>';
   modal.classList.add('on');
   document.body.style.overflow = 'hidden';
@@ -436,27 +441,34 @@ function bukaDetail(date, code) {
         txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
         '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>';
       // kelompokkan per shipping detail + transport driver + assistant driver
-      let isi, nGrp = 0;
-      if (d.hasShip) {
+      let nGrp = 0;
+      const susun = LL => {
+        if (!d.hasShip) return '<tbody>' + LL.map((o, i) => baris(o, i)).join('') + '</tbody>';
         const G = {};
-        L.forEach(o => {
+        LL.forEach(o => {
           const k = [o.sd, o.td, o.ad].join('||');
           (G[k] = G[k] || {sd: o.sd, td: o.td, ad: o.ad, o: [], cbm: 0});
           G[k].o.push(o); G[k].cbm += num(o.cbm);
         });
         const gl = Object.values(G).sort((a, b) => (!a.sd - !b.sd) || a.sd.localeCompare(b.sd, 'id', {numeric: true}));
-        nGrp = gl.length;
-        isi = gl.map(g => '<tbody><tr class="gr"><td colspan="5"><div class="gi">' +
+        nGrp += gl.length;
+        return gl.map(g => '<tbody><tr class="gr"><td colspan="5"><div class="gi">' +
           '<span><small>Shipping detail</small><b>' + txt(g.sd) + '</b></span>' +
           '<span><small>Transport driver</small><b>' + txt(g.td) + '</b></span>' +
           '<span><small>Assistant driver</small><b>' + txt(g.ad) + '</b></span>' +
           '<span class="gc">' + fmt(g.o.length, 0) + ' order · ' + fmt(g.cbm, 2) + ' CBM</span></div></td></tr>' +
           g.o.map((o, i) => baris(o, i)).join('') + '</tbody>').join('');
-      } else {
-        isi = '<tbody>' + L.map((o, i) => baris(o, i)).join('') + '</tbody>';
-      }
+      };
+      let isi;
+      if (date === '*' && x.zone !== 'LK') {
+        // semua tanggal: dipisah per tanggal, terbaru di atas
+        const D = {};
+        L.forEach(o => { (D[o.dt] = D[o.dt] || []).push(o); });
+        isi = Object.keys(D).sort().reverse().map(t => '<tbody><tr class="dh"><td colspan="5"><b>' + labelTgl(t) + '</b><span>' +
+          fmt(D[t].length, 0) + ' order · ' + fmt(D[t].reduce((z, o) => z + num(o.cbm), 0), 2) + ' CBM</span></td></tr></tbody>' + susun(D[t])).join('');
+      } else isi = susun(L);
       mBody.innerHTML = head + alamat +
-        '<div class="chips"><span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span>' +
+        '<div class="chips">' + (date === '*' ? '<span>' + fmt(Object.keys(x.dates).length, 0) + ' tanggal</span>' : '') + '<span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span>' +
         (nGrp > 1 ? '<span>' + fmt(nGrp, 0) + ' kelompok</span>' : '') + '</div>' +
         '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
         '<th style="text-align:right">CBM</th></tr></thead>' + isi + '</table></div>';
