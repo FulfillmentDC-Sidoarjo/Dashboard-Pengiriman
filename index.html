@@ -237,7 +237,7 @@ const kartu = (x, semua, badge) =>
   '<div class="k2" tabindex="0" role="button" data-d="' + esc(x.date) + '" data-c="' + esc(x.code) + '">' +
   '<div class="a">' + esc(x.code) + (badge && isWH(x) ? '<span class="bw">WH</span>' : '') + '</div>' +
   '<div class="nm">' + esc(x.name) + '</div>' +
-  (semua ? '<div class="dt">' + labelTgl(x.date) + '</div>' : '') +
+  (semua && x.zone !== 'LK' ? '<div class="dt">' + labelTgl(x.date) + '</div>' : '') + // zone LK: tanpa tulisan PENGIRIMAN TANGGAL
   (x.hit && x.hit.length ? '<div class="ord">Order: ' + x.hit.slice(0, 2).map(s => esc(s)).join(', ') + (x.hit.length > 2 ? ' +' + (x.hit.length - 2) : '') + '</div>' : '') +
   '<div class="v"><b>' + fmt(x.cbm, 2) + '</b><span>' + x.n + ' order</span></div></div>';
 
@@ -265,8 +265,8 @@ function render() {
   ROWS.forEach(r => {
     if (!semua && r[0] !== tgl) return;
     const k = r[0] + '|' + r[1];
-    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], wil: wilDari(r), exts: [], n: 0, cbm: 0});
-    map[k].n++; map[k].cbm += r[4]; if (r[5]) map[k].exts.push(String(r[5]));
+    (map[k] = map[k] || {date: r[0], code: r[1], name: r[2], city: r[3], wil: wilDari(r), zone: '', exts: [], n: 0, cbm: 0});
+    map[k].n++; map[k].cbm += r[4]; if (!map[k].zone && r[12]) map[k].zone = String(r[12]).trim().toUpperCase(); if (r[5]) map[k].exts.push(String(r[5]));
   });
   let list = Object.values(map).filter(x =>
     !q || x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q) ||
@@ -381,7 +381,7 @@ function bukaDetail(date, code) {
   const my = ++reqId;
   const head = '<div class="mh"><div class="mhl"><div class="code">' + esc(x.code) + '</div>' +
     '<h3 id="mTitle">' + esc(x.name) + '</h3>' +
-    '<div class="tg">' + labelTgl(x.date) + '</div></div>' + '</div>';
+    (x.zone !== 'LK' ? '<div class="tg">' + labelTgl(x.date) + '</div>' : '') + '</div></div>';
   mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Memuat detail order...</div>';
   modal.classList.add('on');
   document.body.style.overflow = 'hidden';
