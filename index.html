@@ -144,8 +144,13 @@
   .tw tr:nth-child(even) td{background:#F7F9FC}
   .tw tr.hl td{background:#FFF1BF}
   .tw tr.gr td{background:#E6EDF8;border-top:2px solid var(--ink);padding:9px 10px;white-space:normal}
-  .tw tr.dh td{background:var(--ink);color:#fff;border-top:0;padding:9px 10px;white-space:normal}
-  .tw tr.dh td span{float:right;font-weight:600;font-size:11px;opacity:.9}
+  .tw tr.gr{cursor:pointer}
+  .tw tr.gr:hover td{background:#D6E2F5}
+  .tw tr.gr:focus-visible{outline:2px solid var(--yel);outline-offset:-2px}
+  .gi .cv{align-self:center;font-size:12px;color:var(--ink);transition:transform .15s}
+  .grp.open .cv{transform:rotate(90deg)}
+  .grp:not(.open) tr.o{display:none}
+  .tw:has(.grp):not(:has(.grp.open)) thead{display:none}
   .gi{display:flex;flex-wrap:wrap;gap:6px 28px;align-items:flex-start}
   .gi span{display:flex;flex-direction:column;gap:1px;min-width:0}
   .gi small{font-size:10px;font-weight:600;color:var(--ink2)}
@@ -437,40 +442,41 @@ function bukaDetail(date, code) {
       const tot = L.reduce((s, o) => s + num(o.cbm), 0);
       const qq = document.getElementById('cari').value.trim().toLowerCase();
       const alamat = L[0].address ? '<div class="adr">' + esc(String(L[0].address)) + '</div>' : '';
-      const baris = (o, i) => '<tr' + (qq && String(o.ext).toLowerCase().includes(qq) ? ' class="hl"' : '') + '><td>' + (i + 1) + '</td><td>' +
+      const baris = (o, i) => '<tr class="o' + (qq && String(o.ext).toLowerCase().includes(qq) ? ' hl' : '') + '"><td>' + (i + 1) + '</td><td>' +
         txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
         '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>';
       // kelompokkan per shipping detail + transport driver + assistant driver
-      let nGrp = 0;
-      const susun = LL => {
-        if (!d.hasShip) return '<tbody>' + LL.map((o, i) => baris(o, i)).join('') + '</tbody>';
+      // ringkasan dulu: satu baris per (tanggal +) shipping detail + transport driver + assistant driver; order muncul setelah diklik
+      const showDt = date === '*' && x.zone !== 'LK';
+      let isi, nGrp = 0;
+      if (d.hasShip) {
         const G = {};
-        LL.forEach(o => {
-          const k = [o.sd, o.td, o.ad].join('||');
-          (G[k] = G[k] || {sd: o.sd, td: o.td, ad: o.ad, o: [], cbm: 0});
+        L.forEach(o => {
+          const k = [showDt ? o.dt : '', o.sd, o.td, o.ad].join('||');
+          (G[k] = G[k] || {dt: o.dt, sd: o.sd, td: o.td, ad: o.ad, o: [], cbm: 0});
           G[k].o.push(o); G[k].cbm += num(o.cbm);
         });
-        const gl = Object.values(G).sort((a, b) => (!a.sd - !b.sd) || a.sd.localeCompare(b.sd, 'id', {numeric: true}));
-        nGrp += gl.length;
-        return gl.map(g => '<tbody><tr class="gr"><td colspan="5"><div class="gi">' +
-          '<span><small>Shipping detail</small><b>' + txt(g.sd) + '</b></span>' +
-          '<span><small>Transport driver</small><b>' + txt(g.td) + '</b></span>' +
-          '<span><small>Assistant driver</small><b>' + txt(g.ad) + '</b></span>' +
-          '<span class="gc">' + fmt(g.o.length, 0) + ' order · ' + fmt(g.cbm, 2) + ' CBM</span></div></td></tr>' +
-          g.o.map((o, i) => baris(o, i)).join('') + '</tbody>').join('');
-      };
-      let isi;
-      if (date === '*' && x.zone !== 'LK') {
-        // semua tanggal: dipisah per tanggal, terbaru di atas
-        const D = {};
-        L.forEach(o => { (D[o.dt] = D[o.dt] || []).push(o); });
-        isi = Object.keys(D).sort().reverse().map(t => '<tbody><tr class="dh"><td colspan="5"><b>' + labelTgl(t) + '</b><span>' +
-          fmt(D[t].length, 0) + ' order · ' + fmt(D[t].reduce((z, o) => z + num(o.cbm), 0), 2) + ' CBM</span></td></tr></tbody>' + susun(D[t])).join('');
-      } else isi = susun(L);
+        const gl = Object.values(G).sort((a, b) => (showDt ? b.dt.localeCompare(a.dt) : 0) ||
+          (!a.sd - !b.sd) || a.sd.localeCompare(b.sd, 'id', {numeric: true}));
+        nGrp = gl.length;
+        isi = gl.map(g => {
+          const buka = !!qq && g.o.some(o => String(o.ext).toLowerCase().includes(qq)); // order yang dicari langsung terbuka
+          return '<tbody class="grp' + (buka ? ' open' : '') + '"><tr class="gr" tabindex="0" role="button" aria-expanded="' + buka + '"><td colspan="5"><div class="gi">' +
+            '<span class="cv" aria-hidden="true">&#9656;</span>' +
+            (showDt ? '<span><small>' + (g.dt > hariIni() ? 'Plan pengiriman tanggal' : 'Pengiriman tanggal') + '</small><b>' + fmtTgl(g.dt) + '</b></span>' : '') +
+            '<span><small>Shipping detail</small><b>' + txt(g.sd) + '</b></span>' +
+            '<span><small>Transport driver</small><b>' + txt(g.td) + '</b></span>' +
+            '<span><small>Assistant driver</small><b>' + txt(g.ad) + '</b></span>' +
+            '<span class="gc">' + fmt(g.o.length, 0) + ' order · ' + fmt(g.cbm, 2) + ' CBM</span></div></td></tr>' +
+            g.o.map((o, i) => baris(o, i)).join('') + '</tbody>';
+        }).join('');
+      } else {
+        isi = '<tbody>' + L.map((o, i) => baris(o, i)).join('') + '</tbody>';
+      }
       mBody.innerHTML = head + alamat +
         '<div class="chips">' + (date === '*' ? '<span>' + fmt(Object.keys(x.dates).length, 0) + ' tanggal</span>' : '') + '<span>' + fmt(L.length, 0) + ' order</span><span>' + fmt(tot, 2) + ' CBM</span>' +
         (nGrp > 1 ? '<span>' + fmt(nGrp, 0) + ' kelompok</span>' : '') + '</div>' +
-        '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
+        (d.hasShip ? '<div class="adr">Klik salah satu baris untuk melihat daftar order.</div>' : '') + '<div class="tw"><table><thead><tr><th>#</th><th>External order key</th><th>Status WMS</th><th>Fulfillment</th>' +
         '<th style="text-align:right">CBM</th></tr></thead>' + isi + '</table></div>';
       const hl1 = mBody.querySelector('tr.hl');
       if (hl1) hl1.scrollIntoView({block: 'center'});
@@ -501,6 +507,17 @@ outEl.addEventListener('keydown', e => {
   if (t) { e.preventDefault(); urutKlik(t); return; }
   const b = e.target.closest('.k2');
   if (b) { e.preventDefault(); bukaDetail(b.dataset.d, b.dataset.c); }
+});
+const bukaTutup = r => {
+  const t = r.parentNode;
+  t.classList.toggle('open');
+  r.setAttribute('aria-expanded', t.classList.contains('open'));
+};
+mBody.addEventListener('click', e => { const r = e.target.closest('tr.gr'); if (r) bukaTutup(r); });
+mBody.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const r = e.target.closest('tr.gr');
+  if (r) { e.preventDefault(); bukaTutup(r); }
 });
 document.getElementById('mClose').addEventListener('click', tutup);
 modal.addEventListener('click', e => { if (e.target === modal) tutup(); });
