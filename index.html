@@ -361,7 +361,7 @@
       <h1 class="spt">PENCARIAN ORDER</h1>
       <div class="sw" id="sw2">
         <svg class="sic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg>
-        <input type="search" id="q2" placeholder="Cari order key, ship to, toko, kota, driver, status..." aria-label="Cari order" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sg2" aria-autocomplete="list">
+        <input type="search" id="q2" placeholder="Cari order key, ship to, toko, kota, driver, status, type..." aria-label="Cari order" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sg2" aria-autocomplete="list">
         <div class="sg" id="sg2" role="listbox" hidden></div>
       </div>
       <label class="ck"><input type="checkbox" id="or2"> Cocokkan salah satu kata (untuk banyak order key)</label>
@@ -397,7 +397,9 @@
 const API = 'https://script.google.com/macros/s/AKfycbwrAckizj_u62pHaYZJ1fvDNjpee-6qkGFSTvTRwEwMXRmOgJzyNGshP9Oi4zcYn6Ba/exec?token=dashboard-pengiriman-250403109876dd';
 const fmt = (n, d) => n.toLocaleString('id-ID', {minimumFractionDigits: d, maximumFractionDigits: d});
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let ROWS = [];
+let ROWS = [];  // SEMUA type: dipakai menu PENCARIAN ORDER
+let ROWS1 = []; // hanya type di daftar TYPE_TAMPIL (Code.gs): dipakai menu PENGIRIMAN GRW
+const normT = t => String(t || '').toUpperCase().replace(/[\s\-_]/g, '');
 let ADDR = {}; // alamat per ship to
 let WIL = {}; // wilayah per ship to (opsional; bisa juga kolom ke-9 di tiap baris)
 let HAS_WIL = false;
@@ -412,10 +414,14 @@ const CUR = {}; // kartu yang sedang tampil, kunci: tanggal|kode
 fetch(API).then(r => r.json()).then(d => {
   if (d.error) throw new Error(d.error);
   ROWS = d.rows || [];
+  // menu PENGIRIMAN GRW: saring sesuai daftar d.grw; daftar kosong / tidak ada = semua type
+  const okT = {};
+  (Array.isArray(d.grw) ? d.grw : []).forEach(t => { okT[normT(t)] = 1; });
+  ROWS1 = Object.keys(okT).length ? ROWS.filter(r => okT[normT(r[14])]) : ROWS;
   ADDR = d.addr || {};
   WIL = d.wil || {};
-  HAS_WIL = ROWS.some(r => wilDari(r));
-  const dates = ROWS.map(r => r[0]).sort();
+  HAS_WIL = ROWS1.some(r => wilDari(r));
+  const dates = ROWS1.map(r => r[0]).sort();
   const tgl = document.getElementById('tgl');
   if (dates.length) {
     tgl.min = dates[0];
@@ -518,13 +524,13 @@ function render() {
     document.getElementById('tabs').innerHTML = '';
     document.getElementById('ft').innerHTML = '';
     document.getElementById('sTgl').textContent = '';
-    out.innerHTML = pesan(ROWS.length ? 'Pilih tanggal keberangkatan, atau ketik ship to / nama toko untuk mencari di semua tanggal.'
+    out.innerHTML = pesan(ROWS1.length ? 'Pilih tanggal keberangkatan, atau ketik ship to / nama toko untuk mencari di semua tanggal.'
       : 'Belum ada data dengan TYPE yang ditampilkan. Cek kolom H di spreadsheet dan daftar TYPE_TAMPIL di Code.gs.');
     return;
   }
 
   const map = {};
-  ROWS.forEach(r => {
+  ROWS1.forEach(r => {
     if (!semua && r[0] !== tgl) return;
     // semua tanggal: satu baris per ship to (semua tanggal digabung); satu tanggal: satu baris per ship to
     const k = semua ? r[1] : r[0] + '|' + r[1];
@@ -633,8 +639,8 @@ function tutup() {
 }
 
 // detail diambil dari data yang sudah dimuat, jadi tanpa menunggu server
-function detailDari(date, code) {
-  const L = ROWS.filter(r => (date === '*' || r[0] === date) && r[1] === code);
+function detailDari(date, code, src) {
+  const L = (src || ROWS1).filter(r => (date === '*' || r[0] === date) && r[1] === code);
   if (L.length && L[0].length < 8) return {}; // Code.gs lama belum mengirim detail
   const s = v => String(v == null ? '' : v).trim();
   return {hasShip: L.length > 0 && L[0].length >= 12,
@@ -648,6 +654,7 @@ function bukaDetail(date, code) {
   const my = ++reqId;
   const tk = DQ !== null ? DQ : tokensOf(document.getElementById('cari').value);
   setHL(tk);
+  const src = DQ !== null ? ROWS : ROWS1; // dibuka dari PENCARIAN ORDER = semua type
   const mt = v => tk.length > 0 && tk.some(t => String(v == null ? '' : v).toLowerCase().includes(t));
   const txh = v => (v == null || v === '' ? '-' : hl(v));
   const head = '<div class="mh"><div class="mhl"><div class="code">' + hl(x.code) + '</div>' +
@@ -658,7 +665,7 @@ function bukaDetail(date, code) {
   document.body.style.overflow = 'hidden';
 
   Promise.resolve()
-    .then(() => detailDari(date, code))
+    .then(() => detailDari(date, code, src))
     .then(d => {
       if (my !== reqId) return;
       if (!Array.isArray(d.details)) {
@@ -798,7 +805,7 @@ const tglEl = document.getElementById('tgl'), calEl = document.getElementById('c
 let cy = 0, cm = 0, dataSet = null, dataN = -1;
 const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 function gambarCal() {
-  if (dataN !== ROWS.length) { dataSet = new Set(ROWS.map(r => r[0])); dataN = ROWS.length; }
+  if (dataN !== ROWS1.length) { dataSet = new Set(ROWS1.map(r => r[0])); dataN = ROWS1.length; }
   const sel = tglEl.value, today = hariIni();
   const first = new Date(cy, cm, 1), lead = (first.getDay() + 6) % 7, total = Math.ceil((lead + new Date(cy, cm + 1, 0).getDate()) / 7) * 7;
   let g = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(h => '<span>' + h + '</span>').join('');
