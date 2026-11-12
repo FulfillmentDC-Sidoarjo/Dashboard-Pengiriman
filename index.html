@@ -479,7 +479,7 @@ const near = (w, t, d) => (Math.abs(w.length - t.length) <= d && lev(w, t) <= d)
 const isWH = x => /^H/i.test(x.code) || /^WH\b/i.test(x.name);
 
 const KOL = {code: 'Kode', name: 'Ship to', wil: 'Wilayah', date: 'Tanggal', n: 'Order', cbm: 'CBM'};
-const fmtTgl = t => { const p = t.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; };
+const fmtTgl = t => { if (!t) return '-'; const p = t.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; };
 const urut = arr => arr.slice().sort((a, b) => {
   const va = a[sortKey], vb = b[sortKey];
   const c = (typeof va === 'number' && typeof vb === 'number') ? va - vb
