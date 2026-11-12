@@ -49,6 +49,18 @@
   @keyframes drift{to{transform:translate3d(75vw,45vh,0)}}
   @media (prefers-reduced-motion:reduce){.bgfx i,.bgfx b,.bgfx::after{animation:none}.bgfx i:nth-child(1){opacity:1;transform:none}}
 
+  /* sidebar + area isi */
+  .shell{display:flex;min-height:100vh}
+  .side{flex:none;width:236px;background:rgba(36,79,145,.94);border-right:1px solid rgba(255,255,255,.12);padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:16px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:15}
+  .sbb{display:flex;align-items:center;gap:10px;padding:2px 8px 14px;border-bottom:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:800;line-height:1.2;text-transform:lowercase}
+  .side nav{display:flex;flex-direction:column;gap:4px}
+  .nv{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--tx);background:transparent;border:0;border-radius:10px;padding:12px;cursor:pointer}
+  .nv:hover{background:rgba(255,255,255,.08)}
+  .nv.on{background:var(--acbg);color:var(--ac);box-shadow:inset 3px 0 0 var(--ac)}
+  .nv:focus-visible{outline:2px solid var(--yel);outline-offset:-2px}
+  .nv svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .main{flex:1;min-width:0}
+  .app[hidden]{display:none}
   .app{max-width:1120px;margin:0 auto;padding:18px 20px 40px}
   .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .brand{display:flex;align-items:center;gap:10px}
@@ -58,7 +70,7 @@
   .mark i:nth-child(2){background:var(--red)}
   .mark i:nth-child(3){background:var(--yel)}
   .mark i:nth-child(4){background:var(--steel)}
-  .bar h1{font-size:17px;font-weight:800;letter-spacing:-.2px;margin:0;line-height:1.2;text-transform:lowercase}
+  .bar h1{font-size:17px;font-weight:800;letter-spacing:.4px;margin:0;line-height:1.2}
   .meta{color:var(--mut);font-size:12px}
 
   /* bar kontrol: tanggal, pencarian, semua tanggal */
@@ -194,16 +206,47 @@
   .pill{display:inline-block;padding:2px 8px;border-radius:10px;background:#FBE9B7;color:var(--ink);font-weight:600;font-size:11px}
   .pill.ok{background:#CFE5DE}
   .empty{padding:40px;text-align:center;color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:14px}
-  @media(max-width:720px){.ctl .dtw{width:100%}.dtb{margin-left:auto}.cal{width:min(300px,calc(100vw - 28px))}.tbl .cw{display:none}.app{padding:14px}.sum .sd{margin-left:0}.tabs .so{margin-left:0}}
+  /* pencarian order */
+  .sw{position:relative;flex:1;min-width:220px;display:flex}
+  .sw input[type=search]{flex:1;width:100%;min-width:0;font-size:15px;padding:12px 14px}
+  .sg{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:25;background:var(--card);color:var(--ink);border-radius:12px;border-top:4px solid var(--yel);box-shadow:0 14px 34px rgba(0,0,0,.45);overflow-y:auto;max-height:min(420px,60vh)}
+  .sg[hidden]{display:none}
+  .sgi{display:flex;align-items:baseline;gap:10px;padding:8px 12px;cursor:pointer;border-top:1px solid #E3E8F0;font-size:12px}
+  .sgi:first-child{border-top:0}
+  .sgi:hover,.sgi.on{background:#E6EDF8}
+  .sgt{flex:none;width:62px;font-size:10px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.3px}
+  .sgl{font-weight:700;min-width:0;word-break:break-word}
+  .sgs{margin-left:auto;padding-left:8px;font-size:11px;color:var(--ink2);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:45%}
+  .sgn{padding:10px 12px;font-size:12px;color:var(--ink2)}
+  mark{background:#FFE08A;color:inherit;border-radius:3px;padding:0 1px}
+  .tbl td.nw{white-space:nowrap}
+  .tbl td small{display:block;font-size:11px;color:var(--ink2);font-weight:500}
+  .hint{max-width:640px;margin:0 auto;text-align:left;line-height:1.7}
+  .hint b{color:var(--ink)}
+  .hint ul{margin:8px 0 0 18px;padding:0}
+  .ft .note{margin-right:auto;color:var(--yel);font-weight:600}
+  @media(max-width:720px){.shell{flex-direction:column}.side{width:100%;height:auto;flex-direction:row;align-items:center;padding:8px 10px;gap:8px;overflow-x:auto}.sbb{display:none}.side nav{flex-direction:row;gap:6px}.nv{width:auto;white-space:nowrap;padding:10px 12px}.ctl .dtw{width:100%}.dtb{margin-left:auto}.cal{width:min(300px,calc(100vw - 28px))}.tbl .cw{display:none}.app{padding:14px}.sum .sd{margin-left:0}.tabs .so{margin-left:0}}
 </style>
 </head>
 <body>
 <div class="bgfx" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
-<div class="app">
+<div class="shell">
+<aside class="side" aria-label="Menu utama">
+  <div class="sbb"><div class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div><span>dashboard<br>pengiriman</span></div>
+  <nav>
+    <button type="button" class="nv on" data-v="v1" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+      <span>PENGIRIMAN GRW</span></button>
+    <button type="button" class="nv" data-v="v2">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg>
+      <span>PENCARIAN ORDER</span></button>
+  </nav>
+</aside>
+<div class="main">
+<div class="app" id="v1">
   <header class="bar">
     <div class="brand">
-      <div class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <h1>Dashboard pengiriman</h1>
+      <h1>PENGIRIMAN GRW</h1>
     </div>
     <span class="meta" id="meta"></span>
   </header>
@@ -227,6 +270,32 @@
   <div class="tabs" id="tabs" role="group" aria-label="Jenis tujuan"></div>
   <div id="out"><div class="empty">Memuat data...</div></div>
   <div class="ft" id="ft"></div>
+</div>
+
+<div class="app" id="v2" hidden>
+  <header class="bar">
+    <div class="brand">
+      <h1>PENCARIAN ORDER</h1>
+    </div>
+    <span class="meta" id="meta2"></span>
+  </header>
+  <div class="ctl">
+    <div class="sw" id="sw2">
+      <input type="search" id="q2" placeholder="Cari external order key, ship to, toko, kota, driver, status..." aria-label="Cari order" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sg2" aria-autocomplete="list">
+      <div class="sg" id="sg2" role="listbox" hidden></div>
+    </div>
+    <label class="ck"><input type="checkbox" id="or2"> Cocokkan salah satu kata (untuk banyak order key)</label>
+  </div>
+  <div class="sum">
+    <span><b id="o2n">-</b> order</span>
+    <span><b id="o2s">-</b> ship to</span>
+    <span><b id="o2c">-</b> CBM</span>
+    <span class="sd" id="o2i"></span>
+  </div>
+  <div id="out2"><div class="empty">Memuat data...</div></div>
+  <div class="ft" id="ft2"></div>
+</div>
+</div>
 </div>
 <div id="modal" class="modal" aria-hidden="true">
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -263,11 +332,13 @@ fetch(API).then(r => r.json()).then(d => {
     tgl.max = dates[dates.length - 1];
     tgl.value = dates[dates.length - 1];
   }
-  document.getElementById('meta').textContent = 'Data diperbarui ' +
+  document.getElementById('meta').textContent = document.getElementById('meta2').textContent = 'Data diperbarui ' +
     new Date(d.updated).toLocaleString('id-ID', {dateStyle: 'medium', timeStyle: 'short'});
   render();
+  if (window.siapOrder) siapOrder();
 }).catch(() => {
   document.getElementById('out').innerHTML = '<div class="empty">Data belum bisa dimuat.</div>';
+  document.getElementById('out2').innerHTML = '<div class="empty">Data belum bisa dimuat.</div>';
 });
 
 const hariIni = () => {
@@ -283,6 +354,30 @@ const pesan = t => '<div class="empty">' + t + '</div>';
 // wilayah: dari d.wil[kode ship to], atau kolom ke-9 (indeks 8) pada baris
 const NO_WIL = 'Tanpa wilayah';
 const wilDari = r => String((WIL[r[1]] != null ? WIL[r[1]] : r[8]) || '').trim();
+
+// ===== pembantu pencarian (dipakai menu PENCARIAN ORDER dan jendela detail) =====
+const tokensOf = s => String(s || '').trim().toLowerCase().split(/[\s,;]+/).filter(Boolean).slice(0, 30);
+let HLRE = null, DQ = null; // DQ: kata pencarian untuk jendela detail (null = pakai kotak cari menu 1)
+const setHL = ts => {
+  const p = ts.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).sort((a, b) => b.length - a.length);
+  HLRE = p.length ? new RegExp('(' + p.join('|') + ')', 'gi') : null;
+};
+const hl = v => {
+  const s = String(v == null ? '' : v);
+  if (!HLRE) return esc(s);
+  return s.split(HLRE).map((p, i) => i % 2 ? '<mark>' + esc(p) + '</mark>' : esc(p)).join('');
+};
+const lev = (a, b) => {
+  let p = []; for (let j = 0; j <= b.length; j++) p[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    const c = [i];
+    for (let j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    p = c;
+  }
+  return p[b.length];
+};
+const near = (w, t, d) => (Math.abs(w.length - t.length) <= d && lev(w, t) <= d) ||
+  (w.length > t.length && lev(w.slice(0, t.length), t) <= d);
 
 // warehouse = kode berawalan H atau nama berawalan WH, selebihnya store
 const isWH = x => /^H/i.test(x.code) || /^WH\b/i.test(x.name);
@@ -461,8 +556,12 @@ function bukaDetail(date, code) {
   const x = CUR[date + '|' + code];
   if (!x) return;
   const my = ++reqId;
-  const head = '<div class="mh"><div class="mhl"><div class="code">' + esc(x.code) + '</div>' +
-    '<h3 id="mTitle">' + esc(x.name) + '</h3>' +
+  const tk = DQ !== null ? DQ : tokensOf(document.getElementById('cari').value);
+  setHL(tk);
+  const mt = v => tk.length > 0 && tk.some(t => String(v == null ? '' : v).toLowerCase().includes(t));
+  const txh = v => (v == null || v === '' ? '-' : hl(v));
+  const head = '<div class="mh"><div class="mhl"><div class="code">' + hl(x.code) + '</div>' +
+    '<h3 id="mTitle">' + hl(x.name) + '</h3>' +
     (x.zone !== 'LK' ? '<div class="tg">' + (date === '*' ? fmt(Object.keys(x.dates).length, 0) + ' tanggal pengiriman' : labelTgl(x.date)) + '</div>' : '') + '</div></div>';
   mBody.innerHTML = head + '<div class="empty" style="margin-top:14px">Memuat detail order...</div>';
   modal.classList.add('on');
@@ -482,10 +581,9 @@ function bukaDetail(date, code) {
         return;
       }
       const tot = L.reduce((s, o) => s + num(o.cbm), 0);
-      const qq = document.getElementById('cari').value.trim().toLowerCase();
-      const alamat = L[0].address ? '<div class="adr">' + esc(String(L[0].address)) + '</div>' : '';
-      const baris = (o, i) => '<tr class="o' + (qq && String(o.ext).toLowerCase().includes(qq) ? ' hl' : '') + '"><td>' + (i + 1) + '</td><td>' +
-        txt(o.ext) + '</td><td>' + txt(o.status) + '</td><td>' + pill(o.fulfillment) +
+      const alamat = L[0].address ? '<div class="adr">' + hl(L[0].address) + '</div>' : '';
+      const baris = (o, i) => '<tr class="o' + (mt(o.ext) || mt(o.status) || mt(o.fulfillment) ? ' hl' : '') + '"><td>' + (i + 1) + '</td><td>' +
+        txh(o.ext) + '</td><td>' + txh(o.status) + '</td><td>' + pill(o.fulfillment) +
         '</td><td style="text-align:right">' + fmt(num(o.cbm), 2) + '</td></tr>';
       // kelompokkan per shipping detail + transport driver + assistant driver
       // ringkasan dulu: satu baris per (tanggal +) shipping detail + transport driver + assistant driver; order muncul setelah diklik
@@ -505,11 +603,11 @@ function bukaDetail(date, code) {
           (!a.sd - !b.sd) || a.sd.localeCompare(b.sd, 'id', {numeric: true}));
         nGrp = gl.length;
         isi = gl.map(g => {
-          const buka = !!qq && g.o.some(o => String(o.ext).toLowerCase().includes(qq)); // order yang dicari langsung terbuka
+          const buka = tk.length > 0 && g.o.some(o => mt(o.ext) || mt(o.status) || mt(o.fulfillment)); // order yang dicari langsung terbuka
           return '<tbody class="grp' + (buka ? ' open' : '') + '"><tr class="gr" tabindex="0" role="button" aria-expanded="' + buka + '">' +
             '<td class="cv" aria-hidden="true"><span>&#9656;</span></td>' +
             (showDt ? '<td class="cp">' + (g.dt > hariIni() ? '<small>PLAN</small> ' : '') + fmtTgl(g.dt) + '</td>' : '') +
-            '<td class="cs">' + txt(g.sd) + '</td><td>' + txt(g.td) + '</td><td>' + txt(g.ad) + '</td>' +
+            '<td class="cs">' + txh(g.sd) + '</td><td>' + txh(g.td) + '</td><td>' + txh(g.ad) + '</td>' +
             '<td class="r">' + fmt(g.o.length, 0) + ' order<br><span style="font-weight:700">' + fmt(g.cbm, 2) + ' CBM</span></td></tr>' +
             '<tr class="od"><td colspan="' + NC + '">' + ot(g.o) + '</td></tr></tbody>';
         }).join('');
@@ -651,6 +749,236 @@ calEl.addEventListener('click', e => {
 });
 document.addEventListener('click', e => { if (!calEl.hidden && !dtwEl.contains(e.target)) bukaCal(false); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !calEl.hidden) { bukaCal(false); dtBtn.focus(); } });
+
+// ===================== menu samping =====================
+const VIEWS = {grw: 'v1', order: 'v2'};
+function showView(v, fokus) {
+  tutup();
+  ['v1', 'v2'].forEach(id => { document.getElementById(id).hidden = id !== v; });
+  document.querySelectorAll('.nv').forEach(b => {
+    const on = b.dataset.v === v;
+    b.classList.toggle('on', on);
+    if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+  try { history.replaceState(null, '', v === 'v2' ? '#order' : '#grw'); } catch (e) {}
+  document.title = v === 'v2' ? 'Pencarian order' : 'Dashboard pengiriman';
+  if (v === 'v2' && fokus) document.getElementById('q2').focus();
+}
+document.querySelector('.side nav').addEventListener('click', e => {
+  const b = e.target.closest('.nv');
+  if (b) showView(b.dataset.v, true);
+});
+showView(VIEWS[(location.hash || '').slice(1)] || 'v1', false);
+
+// ===================== menu PENCARIAN ORDER =====================
+const q2El = document.getElementById('q2'), sg2El = document.getElementById('sg2'), or2El = document.getElementById('or2');
+const out2 = document.getElementById('out2'), ft2 = document.getElementById('ft2');
+let IDX = null, VOCAB = null, SUG = null, SGL = [], sgOn = -1;
+let s2Key = '', s2Dir = 'desc', s2Limit = 100, R2 = [], TOK2 = [], FUZ2 = false;
+const KOL2 = [['date', 'Tanggal'], ['ext', 'External order key'], ['name', 'Ship to'], ['kota', 'Kota'], ['status', 'Status WMS'], ['ful', 'Fulfillment'], ['cbm', 'CBM'], ['sd', 'Shipping detail'], ['drv', 'Driver']];
+const val2 = (r, k) => k === 'date' ? r[0] : k === 'ext' ? r[5] : k === 'name' ? r[2] : k === 'kota' ? r[3] : k === 'status' ? r[6] : k === 'ful' ? r[7] : k === 'cbm' ? r[4] : k === 'sd' ? r[9] : (r[10] + ' ' + r[11]);
+
+// dipanggil setelah data dimuat: indeks teks per baris + indeks saran
+function siapOrder() {
+  IDX = ROWS.map(r => [r[5], r[1], r[2], r[3], wilDari(r), ADDR[r[1]], r[6], r[7], r[9], r[10], r[11]].map(v => String(v == null ? '' : v)).join('\n').toLowerCase());
+  const M = {ship: new Map(), order: new Map(), kota: new Map(), wil: new Map(), drv: new Map()};
+  const add = (k, v, o) => { v = String(v == null ? '' : v).trim(); if (v && v.charAt(0) !== '#' && !M[k].has(v)) M[k].set(v, o); };
+  ROWS.forEach(r => {
+    add('ship', r[1], {s: r[2]});
+    add('order', r[5], {s: r[2] + ' (' + r[1] + ')'});
+    add('kota', r[3], {}); add('wil', wilDari(r), {});
+    add('drv', r[9], {}); add('drv', r[10], {}); add('drv', r[11], {});
+  });
+  const mk = (k, tipe) => Array.from(M[k].entries()).map(e => ({tipe: tipe, v: e[0], l: k === 'ship' ? e[0] + ' · ' + (e[1].s || '') : e[0], s: k === 'ship' ? '' : (e[1].s || ''),
+    k: (k === 'ship' ? e[0] + ' ' + (e[1].s || '') : e[0]).toLowerCase()}));
+  SUG = [mk('ship', 'Ship to'), mk('order', 'Order'), mk('kota', 'Kota'), mk('wil', 'Wilayah'), mk('drv', 'Driver')];
+  cari2();
+}
+
+// kata mirip (salah ketik) dari seluruh kosakata data; kata berangka tidak dicocokkan mirip
+function mirip(t) {
+  if (t.length < 4 || /\d/.test(t)) return [];
+  if (!VOCAB) {
+    const V = new Set();
+    IDX.forEach(h => h.split(/[^a-z0-9]+/).forEach(w => { if (w.length >= 3 && !/\d/.test(w)) V.add(w); }));
+    VOCAB = Array.from(V);
+  }
+  const d = t.length >= 8 ? 2 : 1, o = [];
+  for (let i = 0; i < VOCAB.length && o.length < 12; i++) if (VOCAB[i] !== t && near(VOCAB[i], t, d)) o.push(VOCAB[i]);
+  return o;
+}
+
+function cari2(tetap) {
+  if (!tetap) s2Limit = 100;
+  const q = q2El.value.trim().toLowerCase();
+  const or = or2El.checked;
+  const toks = Array.from(new Set(tokensOf(q))).slice(0, or ? 30 : 8);
+  TOK2 = toks; FUZ2 = false; R2 = [];
+  const nEl = document.getElementById('o2n'), sEl = document.getElementById('o2s'), cEl = document.getElementById('o2c'), iEl = document.getElementById('o2i');
+  setHL(toks);
+  if (!IDX) { out2.innerHTML = pesan('Data belum dimuat.'); return; }
+  if (!toks.length) {
+    nEl.textContent = sEl.textContent = cEl.textContent = '-'; iEl.textContent = ''; ft2.innerHTML = '';
+    out2.innerHTML = '<div class="empty"><div class="hint"><b>Cari order di seluruh tanggal.</b> Yang bisa dicari:<ul>' +
+      '<li>External order key (lengkap atau sebagian)</li><li>Kode ship to, nama toko, kota, wilayah, dan alamat</li>' +
+      '<li>Shipping detail, transport driver, dan assistant driver</li><li>Status WMS dan fulfillment</li></ul>' +
+      '<br>Ketik beberapa kata sekaligus (urutan bebas), misalnya <b>tuban terkirim</b>. Untuk banyak order key sekaligus, tempel semuanya lalu centang "Cocokkan salah satu kata". ' +
+      'Salah ketik kecil tetap dicari. Klik satu baris untuk membuka detail ship to.</div></div>';
+    return;
+  }
+  let idx = [];
+  const okAll = (h, es) => or ? es.some(x => x.some(w => h.includes(w))) : es.every(x => x.some(w => h.includes(w)));
+  const ex = toks.map(t => [t]);
+  for (let i = 0; i < IDX.length; i++) if (okAll(IDX[i], ex)) idx.push(i);
+  if (!idx.length) {
+    const ex2 = toks.map(t => [t].concat(mirip(t)));
+    for (let i = 0; i < IDX.length; i++) if (okAll(IDX[i], ex2)) idx.push(i);
+    if (idx.length) { FUZ2 = true; setHL(Array.from(new Set([].concat.apply([], ex2)))); }
+  }
+  // skor: kecocokan order key / kode ship to dinilai lebih tinggi
+  const sc = {};
+  idx.forEach(i => {
+    const r = ROWS[i], e = String(r[5]).toLowerCase(), c = String(r[1]).toLowerCase(), n = ' ' + String(r[2]).toLowerCase();
+    let s = 0;
+    toks.forEach(t => { s += e === t ? 8 : e.includes(t) ? 5 : c === t ? 5 : (c.startsWith(t) || n.includes(' ' + t)) ? 3 : IDX[i].includes(t) ? 1 : 0; });
+    sc[i] = s;
+  });
+  idx.sort((a, b) => {
+    if (s2Key) {
+      const va = val2(ROWS[a], s2Key), vb = val2(ROWS[b], s2Key);
+      const c = (typeof va === 'number' && typeof vb === 'number') ? va - vb : String(va == null ? '' : va).localeCompare(String(vb == null ? '' : vb), 'id', {numeric: true});
+      return s2Dir === 'asc' ? c : -c;
+    }
+    return (sc[b] - sc[a]) || String(ROWS[b][0]).localeCompare(String(ROWS[a][0])) || String(ROWS[a][5]).localeCompare(String(ROWS[b][5]));
+  });
+  R2 = idx;
+
+  const ships = new Set(), dts = idx.map(i => ROWS[i][0]).sort();
+  let cbm = 0;
+  idx.forEach(i => { ships.add(ROWS[i][1]); cbm += num(ROWS[i][4]); });
+  nEl.textContent = fmt(idx.length, 0); sEl.textContent = fmt(ships.size, 0); cEl.textContent = fmt(cbm, 2);
+  iEl.textContent = idx.length ? (dts[0] === dts[dts.length - 1] ? fmtTgl(dts[0]) : fmtTgl(dts[0]) + ' - ' + fmtTgl(dts[dts.length - 1])) : '';
+  if (!idx.length) {
+    ft2.innerHTML = '';
+    out2.innerHTML = pesan('Tidak ada order yang cocok dengan "' + esc(q2El.value.trim()) + '". Coba kata yang lebih pendek atau kurangi jumlah kata.');
+    return;
+  }
+  gambar2();
+}
+
+function gambar2() {
+  const lim = R2.slice(0, s2Limit);
+  const th = (k, n) => '<th tabindex="0" data-s="' + k + '" class="' + (k === 'cbm' ? 'r' : '') + '" aria-sort="' + (s2Key === k ? (s2Dir === 'asc' ? 'ascending' : 'descending') : 'none') + '">' + n +
+    (s2Key === k ? '<span class="ar">' + (s2Dir === 'asc' ? '▲' : '▼') + '</span>' : '') + '</th>';
+  const d = v => (v == null || String(v).trim() === '') ? '-' : hl(v);
+  const tr = i => {
+    const r = ROWS[i], lk = String(r[12] || '').trim().toUpperCase() === 'LK', wil = wilDari(r);
+    return '<tr class="k2" tabindex="0" data-c="' + esc(String(r[1])) + '">' +
+      '<td class="cd">' + (lk ? '-' : fmtTgl(r[0]) + (r[0] > hariIni() ? '<span class="bw">PLAN</span>' : '')) + '</td>' +
+      '<td class="nw" style="font-weight:700">' + d(r[5]) + '</td>' +
+      '<td><div class="nm">' + d(r[2]) + '</div><small>' + hl(r[1]) + '</small></td>' +
+      '<td>' + d(r[3]) + (wil ? '<small>' + hl(wil) + '</small>' : '') + '</td>' +
+      '<td class="nw">' + d(r[6]) + '</td>' +
+      '<td class="nw">' + pill(r[7]) + '</td>' +
+      '<td class="r cb">' + fmt(num(r[4]), 2) + '</td>' +
+      '<td class="nw">' + d(r[9]) + '</td>' +
+      '<td class="nw">' + d(r[10]) + (r[11] ? '<small>' + hl(r[11]) + '</small>' : '') + '</td></tr>';
+  };
+  out2.innerHTML = '<div class="tw2"><table class="tbl"><thead><tr>' + KOL2.map(c => th(c[0], c[1])).join('') + '</tr></thead><tbody>' + lim.map(tr).join('') + '</tbody></table></div>';
+  ft2.innerHTML = (FUZ2 ? '<span class="note">Tidak ada yang persis sama. Menampilkan hasil yang mirip.</span>' : '') +
+    'Menampilkan ' + fmt(lim.length, 0) + ' dari ' + fmt(R2.length, 0) + ' order' +
+    (R2.length > lim.length ? '<button type="button" id="more2">Tampilkan ' + fmt(Math.min(100, R2.length - lim.length), 0) + ' lagi</button>' : '');
+}
+
+// buka detail ship to (semua tanggal) dengan kata pencarian disorot
+function detail2(code) {
+  const rr = ROWS.filter(r => r[1] === code);
+  if (!rr.length) return;
+  const x = {d: '*', date: rr[0][0], dates: {}, code: code, name: rr[0][2], city: rr[0][3], wil: wilDari(rr[0]), zone: ''};
+  rr.forEach(r => { x.dates[r[0]] = 1; if (r[0] > x.date) x.date = r[0]; if (!x.zone && r[12]) x.zone = String(r[12]).trim().toUpperCase(); });
+  CUR['*|' + code] = x;
+  DQ = TOK2.slice();
+  try { bukaDetail('*', code); } finally { DQ = null; }
+}
+const urut2 = th => {
+  const k = th.dataset.s;
+  if (s2Key === k) s2Dir = s2Dir === 'asc' ? 'desc' : 'asc';
+  else { s2Key = k; s2Dir = (k === 'cbm' || k === 'date') ? 'desc' : 'asc'; }
+  setHL(TOK2); gambar2();
+  const nh = out2.querySelector('th[data-s="' + k + '"]'); if (nh) nh.focus();
+};
+out2.addEventListener('click', e => {
+  const t = e.target.closest('th[data-s]');
+  if (t) { urut2(t); return; }
+  const b = e.target.closest('.k2');
+  if (b) detail2(b.dataset.c);
+});
+out2.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const t = e.target.closest('th[data-s]');
+  if (t) { e.preventDefault(); urut2(t); return; }
+  const b = e.target.closest('.k2');
+  if (b) { e.preventDefault(); detail2(b.dataset.c); }
+});
+ft2.addEventListener('click', e => {
+  if (!e.target.closest('#more2')) return;
+  s2Limit += 100; setHL(TOK2); gambar2();
+  const nb = document.getElementById('more2'); if (nb) nb.focus();
+});
+or2El.addEventListener('change', () => cari2());
+
+// saran otomatis
+function sgTutup() { sg2El.hidden = true; sgOn = -1; q2El.setAttribute('aria-expanded', 'false'); q2El.removeAttribute('aria-activedescendant'); }
+function sgTampil() {
+  const ts = tokensOf(q2El.value), t = ts[ts.length - 1] || '';
+  if (!SUG || t.length < 2) { sgTutup(); return; }
+  SGL = [];
+  SUG.forEach((arr, gi) => {
+    const lim = gi === 0 ? 4 : 3, st = [], inc = [];
+    for (let i = 0; i < arr.length && st.length < lim; i++) {
+      const p = arr[i].k.indexOf(t);
+      if (p === 0 || (p > 0 && /[\s.\-_|]/.test(arr[i].k.charAt(p - 1)))) st.push(arr[i]); else if (p > 0 && inc.length < lim) inc.push(arr[i]);
+    }
+    SGL = SGL.concat(st.concat(inc).slice(0, lim));
+  });
+  if (!SGL.length) sg2El.innerHTML = '<div class="sgn">Tidak ada saran. Tekan Enter atau lanjut mengetik untuk mencari.</div>';
+  else {
+    const prev = HLRE; setHL([t]);
+    sg2El.innerHTML = SGL.map((s, i) => '<div class="sgi" role="option" id="sgo' + i + '" data-i="' + i + '" aria-selected="false"><span class="sgt">' + s.tipe + '</span><span class="sgl">' +
+      hl(s.l) + '</span>' + (s.s ? '<span class="sgs">' + esc(s.s) + '</span>' : '') + '</div>').join('');
+    HLRE = prev;
+  }
+  sgOn = -1; sg2El.hidden = false; q2El.setAttribute('aria-expanded', 'true');
+}
+function sgSorot(i) {
+  const it = sg2El.querySelectorAll('.sgi');
+  if (!it.length) return;
+  sgOn = (i + it.length) % it.length;
+  it.forEach((e, j) => { e.classList.toggle('on', j === sgOn); e.setAttribute('aria-selected', j === sgOn); });
+  it[sgOn].scrollIntoView({block: 'nearest'});
+  q2El.setAttribute('aria-activedescendant', 'sgo' + sgOn);
+}
+function sgPilih(i) {
+  const s = SGL[i];
+  if (!s) return;
+  const ts = q2El.value.trim().split(/[\s,;]+/).filter(Boolean);
+  if (ts.length <= 1) q2El.value = s.v; else { ts[ts.length - 1] = s.v; q2El.value = ts.join(' '); }
+  sgTutup(); cari2(); q2El.focus();
+}
+let q2Timer = 0;
+q2El.addEventListener('input', () => { sgTampil(); clearTimeout(q2Timer); q2Timer = setTimeout(() => cari2(), 150); });
+q2El.addEventListener('focus', () => { if (q2El.value.trim()) sgTampil(); });
+q2El.addEventListener('keydown', e => {
+  if (sg2El.hidden) { if (e.key === 'ArrowDown' && q2El.value.trim()) sgTampil(); return; }
+  if (e.key === 'ArrowDown') { e.preventDefault(); sgSorot(sgOn + 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); sgSorot(sgOn - 1); }
+  else if (e.key === 'Enter') { if (sgOn >= 0) { e.preventDefault(); sgPilih(sgOn); } else { sgTutup(); clearTimeout(q2Timer); cari2(); } }
+  else if (e.key === 'Escape') sgTutup();
+});
+sg2El.addEventListener('mousedown', e => e.preventDefault()); // fokus tetap di kotak cari
+sg2El.addEventListener('click', e => { const it = e.target.closest('.sgi'); if (it) sgPilih(+it.dataset.i); });
+document.addEventListener('click', e => { if (!sg2El.hidden && !document.getElementById('sw2').contains(e.target)) sgTutup(); });
+window.siapOrder = siapOrder;
 </script>
 </body>
 </html>
