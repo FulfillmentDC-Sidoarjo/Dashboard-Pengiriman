@@ -226,6 +226,89 @@
   .hint ul{margin:8px 0 0 18px;padding:0}
   .ft .note{margin-right:auto;color:var(--yel);font-weight:600}
   @media(max-width:720px){.shell{flex-direction:column}.side{width:100%;height:auto;flex-direction:row;align-items:center;padding:8px 10px;gap:8px;overflow-x:auto}.sbb{display:none}.side nav{flex-direction:row;gap:6px}.nv{width:auto;white-space:nowrap;padding:10px 12px}.ctl .dtw{width:100%}.dtb{margin-left:auto}.cal{width:min(300px,calc(100vw - 28px))}.tbl .cw{display:none}.app{padding:14px}.sum .sd{margin-left:0}.tabs .so{margin-left:0}}
+  /* ===== menu PENCARIAN ORDER: spotlight + kartu tiket + detail kartu ikon ===== */
+  #v2 .spw{padding-top:max(24px,calc(50vh - 100px));transition:padding-top .45s ease}
+  #v2.has .spw{padding-top:24px}
+  #v2 .sp{max-width:640px;margin:0 auto}
+  #v2 .spt{margin:0 0 14px;text-align:center;font-size:17px;font-weight:800;letter-spacing:.4px;line-height:1.2}
+  #v2 .sw{min-width:0}
+  #v2 .sw input[type=search]{border-radius:28px;padding:14px 18px 14px 46px;font-size:15px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.35)}
+  #v2 .sic{position:absolute;left:17px;top:50%;width:18px;height:18px;transform:translateY(-50%);stroke:var(--mut);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+  #v2 .ck{display:flex;justify-content:center;margin:10px 0 0}
+  #v2 .sph{text-align:center;color:var(--mut);font-size:12px;line-height:1.7;margin-top:10px}
+  #v2.has .sph{display:none}
+  #v2:not(.has) .sum,#v2:not(.has) .ft{display:none}
+  #v2.has .sum{margin-top:14px}
+  #v2 .sg{border-radius:14px}
+
+  .tkw{filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));margin-bottom:12px}
+  .tk{--tkw:210px;position:relative;display:flex;background:var(--card);color:var(--ink);border-radius:12px;cursor:pointer;
+    -webkit-mask:radial-gradient(circle 8px at calc(100% - var(--tkw)) 0,#0000 97%,#000),radial-gradient(circle 8px at calc(100% - var(--tkw)) 100%,#0000 97%,#000);
+    -webkit-mask-composite:source-in;
+    mask:radial-gradient(circle 8px at calc(100% - var(--tkw)) 0,#0000 97%,#000),radial-gradient(circle 8px at calc(100% - var(--tkw)) 100%,#0000 97%,#000);
+    mask-composite:intersect}
+  .tk:hover{background:#fff}
+  .tk:focus-visible{outline:2px solid var(--yel);outline-offset:3px}
+  .tkm{flex:1.5;min-width:0;padding:14px 16px}
+  .tkh{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .tkh .wms{font-size:11px;color:var(--ink2)}
+  .tkh .tgl{margin-left:auto;font-size:11px;color:var(--ink2)}
+  .tkk{font-size:14px;font-weight:700;word-break:break-all}
+  .tkr{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .tkr .lb{font-size:11px;color:var(--ink2)}
+  .tkr .vl{font-size:13px;font-weight:700;word-break:break-word}
+  .tkr .kt{font-size:11px;color:var(--ink2)}
+  .tkl{flex:1;display:flex;align-items:center;gap:4px;color:var(--ink2);min-width:30px}
+  .tkl i{flex:1;border-top:1.5px dashed #9AA6B8}
+  .tkl svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .tkto{text-align:right;min-width:0}
+  .tks{width:0;border-left:1.5px dashed #B8C1CF;margin:12px 0;flex:none}
+  .tkr2{width:var(--tkw);flex:none;display:flex}
+  .tkr2 .in{flex:1;min-width:0;padding:14px 8px 14px 16px}
+  .tkr2 .lb{font-size:11px;color:var(--ink2)}
+  .tkr2 .cb{font-size:20px;font-weight:700;line-height:1.1}
+  .tkr2 .vl{font-size:13px;font-weight:700;word-break:break-word}
+  .tkr2 .go{width:64px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--side);font-size:11px;font-weight:700;text-align:center;padding-right:10px;line-height:1.2}
+  .tkr2 .go svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  .od{display:none;position:fixed;inset:0;background:rgba(10,25,55,.74);z-index:30;padding:20px;overflow:auto}
+  .od.on{display:block}
+  .odp{position:relative;max-width:660px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:14px;padding:18px 18px 16px}
+  .odh{display:flex;gap:10px;align-items:flex-start}
+  .odh .t{flex:1;min-width:0}
+  .odh small{display:block;font-size:11px;color:var(--ink2)}
+  .odh b{display:block;font-size:15px;font-weight:700;word-break:break-all;margin-top:2px}
+  .odx{flex:none;width:30px;height:30px;padding:0;border-radius:50%;background:transparent;border:1px solid #B8C1CF;color:var(--ink);font:inherit;font-size:18px;line-height:1;cursor:pointer}
+  .odx:hover{background:#E6EDF8}
+  .odx:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+  .odhi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+  .odhi>div{border-radius:10px;padding:10px 12px;min-width:0}
+  .odhi .ok{background:#DFF0E8;color:#0F5A45}
+  .odhi .wa{background:#FBF1D6;color:#7A5200}
+  .odhi .bl{background:#DFE8F5;color:#244F91}
+  .odhi .lb{display:flex;align-items:center;gap:6px;font-size:11px}
+  .odhi .lb svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .odhi .v{font-size:13px;font-weight:700;margin-top:4px;word-break:break-word}
+  .odhi .v.big{font-size:22px}
+  .odgr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+  .odc{background:#fff;border:1px solid #D3D9E3;border-radius:10px;padding:9px 10px;display:flex;gap:10px;align-items:flex-start;min-width:0}
+  .odc.w{grid-column:1/-1}
+  .odi{width:30px;height:30px;border-radius:8px;background:#DFE8F5;color:#244F91;display:flex;align-items:center;justify-content:center;flex:none}
+  .odi svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .odc .k{font-size:11px;color:var(--ink2)}
+  .odc .v{font-size:12.5px;font-weight:700;word-break:break-word}
+  .odc .v.m{color:#8A95A8;font-weight:500}
+  .odc>div:last-child{min-width:0}
+  @media(max-width:640px){
+    .tk{flex-direction:column;-webkit-mask:none;mask:none}
+    .tkw{filter:none}
+    .tkr2{width:auto}
+    .tks{width:auto;height:0;border-left:0;border-top:1.5px dashed #B8C1CF;margin:0 14px}
+    .odhi,.odgr{grid-template-columns:1fr}
+    .odc.w{grid-column:auto}
+    .od{padding:10px}
+  }
+  @media(prefers-reduced-motion:reduce){#v2 .spw{transition:none}}
 </style>
 </head>
 <body>
@@ -273,29 +356,36 @@
 </div>
 
 <div class="app" id="v2" hidden>
-  <header class="bar">
-    <div class="brand">
-      <h1>PENCARIAN ORDER</h1>
+  <div class="spw">
+    <div class="sp">
+      <h1 class="spt">PENCARIAN ORDER</h1>
+      <div class="sw" id="sw2">
+        <svg class="sic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg>
+        <input type="search" id="q2" placeholder="Cari order key, ship to, toko, kota, driver, status..." aria-label="Cari order" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sg2" aria-autocomplete="list">
+        <div class="sg" id="sg2" role="listbox" hidden></div>
+      </div>
+      <label class="ck"><input type="checkbox" id="or2"> Cocokkan salah satu kata (untuk banyak order key)</label>
+      <div class="sph" id="sph"><span id="sphT">Memuat data...</span><br><span id="meta2"></span></div>
+      <div class="sum">
+        <span><b id="o2n">-</b> order</span>
+        <span><b id="o2s">-</b> ship to</span>
+        <span><b id="o2c">-</b> CBM</span>
+        <span class="sd" id="o2i"></span>
+      </div>
+      <div id="out2"></div>
+      <div class="ft" id="ft2"></div>
     </div>
-    <span class="meta" id="meta2"></span>
-  </header>
-  <div class="ctl">
-    <div class="sw" id="sw2">
-      <input type="search" id="q2" placeholder="Cari external order key, ship to, toko, kota, driver, status..." aria-label="Cari order" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sg2" aria-autocomplete="list">
-      <div class="sg" id="sg2" role="listbox" hidden></div>
-    </div>
-    <label class="ck"><input type="checkbox" id="or2"> Cocokkan salah satu kata (untuk banyak order key)</label>
   </div>
-  <div class="sum">
-    <span><b id="o2n">-</b> order</span>
-    <span><b id="o2s">-</b> ship to</span>
-    <span><b id="o2c">-</b> CBM</span>
-    <span class="sd" id="o2i"></span>
-  </div>
-  <div id="out2"><div class="empty">Memuat data...</div></div>
-  <div class="ft" id="ft2"></div>
 </div>
 </div>
+</div>
+<div id="od" class="od" aria-hidden="true">
+  <div class="odp" role="dialog" aria-modal="true" aria-labelledby="odT">
+    <div class="odh"><div class="t"><small id="odS">Detail order</small><b id="odT"></b></div>
+      <button type="button" class="odx" id="odX" aria-label="Tutup">&times;</button></div>
+    <div class="odhi" id="odHi"></div>
+    <div class="odgr" id="odGr"></div>
+  </div>
 </div>
 <div id="modal" class="modal" aria-hidden="true">
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -780,7 +870,7 @@ const val2 = (r, k) => k === 'date' ? r[0] : k === 'ext' ? r[5] : k === 'name' ?
 
 // dipanggil setelah data dimuat: indeks teks per baris + indeks saran
 function siapOrder() {
-  IDX = ROWS.map(r => [r[5], r[1], r[2], r[3], wilDari(r), ADDR[r[1]], r[6], r[7], r[9], r[10], r[11]].map(v => String(v == null ? '' : v)).join('\n').toLowerCase());
+  IDX = ROWS.map(r => [r[5], r[1], r[2], r[3], wilDari(r), ADDR[r[1]], r[6], r[7], r[9], r[10], r[11], r[13], r[14], r[15]].map(v => String(v == null ? '' : v)).join('\n').toLowerCase());
   const M = {ship: new Map(), order: new Map(), kota: new Map(), wil: new Map(), drv: new Map()};
   const add = (k, v, o) => { v = String(v == null ? '' : v).trim(); if (v && v.charAt(0) !== '#' && !M[k].has(v)) M[k].set(v, o); };
   ROWS.forEach(r => {
@@ -816,14 +906,12 @@ function cari2(tetap) {
   TOK2 = toks; FUZ2 = false; R2 = [];
   const nEl = document.getElementById('o2n'), sEl = document.getElementById('o2s'), cEl = document.getElementById('o2c'), iEl = document.getElementById('o2i');
   setHL(toks);
+  document.getElementById('v2').classList.toggle('has', toks.length > 0);
   if (!IDX) { out2.innerHTML = pesan('Data belum dimuat.'); return; }
   if (!toks.length) {
     nEl.textContent = sEl.textContent = cEl.textContent = '-'; iEl.textContent = ''; ft2.innerHTML = '';
-    out2.innerHTML = '<div class="empty"><div class="hint"><b>Cari order di seluruh tanggal.</b> Yang bisa dicari:<ul>' +
-      '<li>External order key (lengkap atau sebagian)</li><li>Kode ship to, nama toko, kota, wilayah, dan alamat</li>' +
-      '<li>Shipping detail, transport driver, dan assistant driver</li><li>Status WMS dan fulfillment</li></ul>' +
-      '<br>Ketik beberapa kata sekaligus (urutan bebas), misalnya <b>tuban terkirim</b>. Untuk banyak order key sekaligus, tempel semuanya lalu centang "Cocokkan salah satu kata". ' +
-      'Salah ketik kecil tetap dicari. Klik satu baris untuk membuka detail ship to.</div></div>';
+    out2.innerHTML = '';
+    document.getElementById('sphT').textContent = 'Ketik sebagian order key, nama toko, kota, atau driver';
     return;
   }
   let idx = [];
@@ -866,29 +954,87 @@ function cari2(tetap) {
   gambar2();
 }
 
+const drvNama = v => { const t = String(v == null ? '' : v).trim(), i = t.indexOf(' - '); return i > -1 ? t.slice(i + 3) : t; };
+const IC = {
+  hash: '<path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/>',
+  barcode: '<path d="M4 5v14M7 5v14M11 5v14M14 5v14M17 5v14M20 5v14"/>',
+  store: '<path d="M3 9l1-5h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/>',
+  store2: '<path d="M3 9l1-5h16l1 5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 12v8h14v-8"/>',
+  tag: '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><path d="M7 7h.01"/>',
+  pin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  building: '<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/>',
+  truck: '<path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  box: '<path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/>',
+  check: '<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4L12 14l-3-3"/>',
+  chev: '<path d="M9 6l6 6-6 6"/>'
+};
+const ico = n => '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>';
+const kosong = v => { const t = String(v == null ? '' : v).trim(); return (!t || t.charAt(0) === '#') ? '' : t; };
+
 function gambar2() {
   const lim = R2.slice(0, s2Limit);
-  const th = (k, n) => '<th tabindex="0" data-s="' + k + '" class="' + (k === 'cbm' ? 'r' : '') + '" aria-sort="' + (s2Key === k ? (s2Dir === 'asc' ? 'ascending' : 'descending') : 'none') + '">' + n +
-    (s2Key === k ? '<span class="ar">' + (s2Dir === 'asc' ? '▲' : '▼') + '</span>' : '') + '</th>';
-  const d = v => (v == null || String(v).trim() === '') ? '-' : hl(v);
-  const tr = i => {
-    const r = ROWS[i], lk = String(r[12] || '').trim().toUpperCase() === 'LK', wil = wilDari(r);
-    return '<tr class="k2" tabindex="0" data-c="' + esc(String(r[1])) + '">' +
-      '<td class="cd">' + (lk ? '-' : fmtTgl(r[0]) + (r[0] > hariIni() ? '<span class="bw">PLAN</span>' : '')) + '</td>' +
-      '<td class="nw" style="font-weight:700">' + d(r[5]) + '</td>' +
-      '<td><div class="nm">' + d(r[2]) + '</div><small>' + hl(r[1]) + '</small></td>' +
-      '<td>' + d(r[3]) + (wil ? '<small>' + hl(wil) + '</small>' : '') + '</td>' +
-      '<td class="nw">' + d(r[6]) + '</td>' +
-      '<td class="nw">' + pill(r[7]) + '</td>' +
-      '<td class="r cb">' + fmt(num(r[4]), 2) + '</td>' +
-      '<td class="nw">' + d(r[9]) + '</td>' +
-      '<td class="nw">' + d(r[10]) + (r[11] ? '<small>' + hl(r[11]) + '</small>' : '') + '</td></tr>';
+  const tiket = i => {
+    const r = ROWS[i], lk = String(r[12] || '').trim().toUpperCase() === 'LK';
+    const tgl = lk ? '' : fmtTgl(r[0]) + (r[0] > hariIni() ? '<span class="bw">PLAN</span>' : '');
+    const d = v => kosong(v) ? hl(v) : '-';
+    return '<div class="tkw"><div class="tk" tabindex="0" role="button" data-r="' + i + '" aria-label="Klik detail order ' + esc(String(r[5])) + '">' +
+      '<div class="tkm"><div class="tkh">' + pill(r[7]) + '<span class="wms">' + d(r[6]) + '</span><span class="tgl">' + tgl + '</span></div>' +
+      '<div class="tkk">' + d(r[5]) + '</div>' +
+      '<div class="tkr"><div><div class="lb">Dari</div><div class="vl">Gudang</div></div>' +
+      '<div class="tkl"><i></i>' + ico('truck') + '<i></i></div>' +
+      '<div class="tkto"><div class="kt">Ke · ' + hl(r[1]) + '</div><div class="vl">' + d(r[2]) + '</div><div class="kt">' + d(r[3]) + '</div></div></div></div>' +
+      '<div class="tks"></div>' +
+      '<div class="tkr2"><div class="in"><div class="lb">CBM</div><div class="cb">' + fmt(num(r[4]), 2) + '</div>' +
+      '<div class="lb" style="margin-top:10px">Kendaraan</div><div class="vl">' + d(r[9]) + '</div>' +
+      '<div class="lb" style="margin-top:8px">Driver</div><div class="vl">' + (kosong(r[10]) ? hl(drvNama(r[10])) : '-') + '</div></div>' +
+      '<div class="go">' + ico('chev') + '<span>Klik detail</span></div></div></div></div>';
   };
-  out2.innerHTML = '<div class="tw2"><table class="tbl"><thead><tr>' + KOL2.map(c => th(c[0], c[1])).join('') + '</tr></thead><tbody>' + lim.map(tr).join('') + '</tbody></table></div>';
+  out2.innerHTML = lim.map(tiket).join('');
   ft2.innerHTML = (FUZ2 ? '<span class="note">Tidak ada yang persis sama. Menampilkan hasil yang mirip.</span>' : '') +
     'Menampilkan ' + fmt(lim.length, 0) + ' dari ' + fmt(R2.length, 0) + ' order' +
     (R2.length > lim.length ? '<button type="button" id="more2">Tampilkan ' + fmt(Math.min(100, R2.length - lim.length), 0) + ' lagi</button>' : '');
 }
+
+// ===== detail order: kartu info berikon =====
+const odEl = document.getElementById('od'), odX = document.getElementById('odX');
+let odDari = null;
+function bukaOrder(i) {
+  const r = ROWS[i];
+  if (!r) return;
+  const ok = String(r[7]).trim().toUpperCase() === 'TERKIRIM', lk = String(r[12] || '').trim().toUpperCase() === 'LK';
+  document.getElementById('odS').textContent = 'Detail order' + (lk ? '' : ' · ' + fmtTgl(r[0]));
+  document.getElementById('odT').textContent = kosong(r[5]) || '-';
+  const cls = ok ? 'ok' : 'wa';
+  const hi = [[cls, 'check', 'Status WMS', kosong(r[6]), ''], [cls, 'truck', 'Fulfillment', kosong(r[7]), ''], ['bl', 'box', 'CBM', fmt(num(r[4]), 2), ' big']];
+  document.getElementById('odHi').innerHTML = hi.map(h => '<div class="' + h[0] + '"><div class="lb">' + ico(h[1]) + h[2] + '</div><div class="v' + h[4] + '">' + (esc(h[3]) || '-') + '</div></div>').join('');
+  const C = [
+    ['hash', 'Order key', kosong(r[13])], ['barcode', 'External order key', kosong(r[5])],
+    ['store', 'Ship to', kosong(r[1])], ['tag', 'Type', kosong(r[14])],
+    ['store2', 'Name ship to', kosong(r[2]), 1], ['pin', 'Address', kosong(ADDR[r[1]]), 1],
+    ['building', 'City', kosong(r[3])], ['file', 'No LC', kosong(r[15])],
+    ['truck', 'Shipping detail', kosong(r[9])], ['user', 'Transport driver', kosong(r[10])],
+    ['users', 'Assistant driver', kosong(r[11])]
+  ];
+  document.getElementById('odGr').innerHTML = C.map(c => '<div class="odc' + (c[3] ? ' w' : '') + '"><div class="odi">' + ico(c[0]) + '</div><div><div class="k">' + c[1] +
+    '</div><div class="v' + (c[2] ? '' : ' m') + '">' + (c[2] ? esc(c[2]) : '-') + '</div></div></div>').join('');
+  odDari = document.activeElement;
+  odEl.classList.add('on'); odEl.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  odEl.scrollTop = 0; odX.focus();
+}
+function tutupOrder() {
+  if (!odEl.classList.contains('on')) return;
+  odEl.classList.remove('on'); odEl.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (odDari && odDari.focus) odDari.focus();
+}
+odX.addEventListener('click', tutupOrder);
+odEl.addEventListener('click', e => { if (e.target === odEl) tutupOrder(); });
+odEl.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); odX.focus(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupOrder(); });
 
 // buka detail ship to (semua tanggal) dengan kata pencarian disorot
 function detail2(code) {
@@ -908,17 +1054,13 @@ const urut2 = th => {
   const nh = out2.querySelector('th[data-s="' + k + '"]'); if (nh) nh.focus();
 };
 out2.addEventListener('click', e => {
-  const t = e.target.closest('th[data-s]');
-  if (t) { urut2(t); return; }
-  const b = e.target.closest('.k2');
-  if (b) detail2(b.dataset.c);
+  const b = e.target.closest('.tk');
+  if (b) bukaOrder(+b.dataset.r);
 });
 out2.addEventListener('keydown', e => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
-  const t = e.target.closest('th[data-s]');
-  if (t) { e.preventDefault(); urut2(t); return; }
-  const b = e.target.closest('.k2');
-  if (b) { e.preventDefault(); detail2(b.dataset.c); }
+  const b = e.target.closest('.tk');
+  if (b) { e.preventDefault(); bukaOrder(+b.dataset.r); }
 });
 ft2.addEventListener('click', e => {
   if (!e.target.closest('#more2')) return;
