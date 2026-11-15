@@ -1030,7 +1030,19 @@ document.addEventListener('click', e => { if (!calEl.hidden && !dtwEl.contains(e
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !calEl.hidden) { bukaCal(false); dtBtn.focus(); } });
 
 // ===================== pilihan BU =====================
+// Nama di kolom R yang dikenali -> kode BU di dashboard
+const BU_ALIAS = {
+  'INFORMA': 'INFORMA',
+  'IE': 'IE',
+  'INFORMA ELECTRONICS': 'IE',
+  'ELECTRONICS': 'IE',
+  'SELMA': 'SELMA'
+};
 function buOf(r) {
+  // 1) Utamakan kolom R (indeks 17)
+  const v = String(r[17] || '').trim().toUpperCase().replace(/\s+/g, ' ');
+  if (BU_ALIAS[v]) return BU_ALIAS[v];
+  // 2) Kolom R kosong / tidak dikenali: pakai tebakan lama (nama ship to & order key)
   for (const b of BU_RULES) if (b.nama.test(String(r[2] || '')) || b.key.test(String(r[13] || ''))) return b.bu;
   return BU_DEFAULT;
 }
